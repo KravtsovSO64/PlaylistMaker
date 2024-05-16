@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="mainText_size">22sp</dimen>
+    <dimen name="mainCorner_radius">16dp</dimen>
+    <dimen name="mainIcon_padding">10dp</dimen>
+    <dimen name="main_padding">16dp</dimen>
+    <dimen name="settingText_size">16sp</dimen>
+    <dimen name="settingIcon_width">24dp</dimen>
+    <dimen name="settingIcon_height">24dp</dimen>
+    <dimen name="settingIcon_marginTop">16dp</dimen>
+    <dimen name="settingIcon_marginEnd">24dp</dimen>
+    <dimen name="settingPadding">12dp</dimen>
+    <dimen name="settingBar_marginTop">8dp</dimen>
+
+</resources>

@@ -13,8 +13,11 @@ class SettingsActivity : AppCompatActivity() {
         val arrowBack = findViewById<ImageView>(R.id.arrow_back)
 
         arrowBack.setOnClickListener {
-            val returnMain = Intent(this, MainActivity::class.java)
-            startActivity(returnMain)
+            finish()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }
