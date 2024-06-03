@@ -6,5 +6,58 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="61dp">
+
+        <ImageView
+        android:id="@+id/arrow_back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/settingBar_marginTop"
+        android:padding="16dp"
+        android:src="@drawable/ic_arrow_back"
+        android:foreground="?attr/selectableItemBackground"
+        app:tint="@color/setting_header_text" />
+
+        <TextView
+            android:layout_width="208dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="@dimen/settingBar_marginTop"
+            android:fontFamily="@font/ys_display_medium"
+            android:textFontWeight="500"
+            android:gravity="start"
+            android:padding="8dp"
+            android:text="@string/main_search"
+            android:textColor="@color/setting_header_text"
+            android:textSize="@dimen/mainText_size" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginVertical="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:background="@drawable/background_search_line"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/search_EditeText"
+            style="@style/Search_Line"
+            android:drawableStart="@drawable/ic_search"
+            android:hint="@string/main_search"
+            android:inputType="text" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            co
+            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+    </LinearLayout>
+
+
+</LinearLayout>
 
 </LinearLayout>
