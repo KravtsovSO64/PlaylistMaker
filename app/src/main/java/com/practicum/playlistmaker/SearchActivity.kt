@@ -60,12 +60,6 @@ class SearchActivity : AppCompatActivity() {
             View.VISIBLE
         }
     }
-
-    companion object{
-        const val SEARCH_REQUEST = "SEARCH_REQUEST"
-        const val AMOUNT_DEF = ""
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(SEARCH_REQUEST,searchRequest)
@@ -76,6 +70,8 @@ class SearchActivity : AppCompatActivity() {
         searchRequest = savedInstanceState.getString(SEARCH_REQUEST,AMOUNT_DEF)
         lineSearchLine.setText(searchRequest)
     }
-
-
+    companion object{
+        private const val SEARCH_REQUEST = "SEARCH_REQUEST"
+        private const val AMOUNT_DEF = ""
+    }
 }
