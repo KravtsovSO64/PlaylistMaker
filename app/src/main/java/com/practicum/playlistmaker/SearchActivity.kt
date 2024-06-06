@@ -65,7 +65,9 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
+        val lineSearchLine = findViewById<EditText>(R.id.editText)
         searchRequest = savedInstanceState.getString(SEARCH_REQUEST,AMOUNT_DEF)
+        lineSearchLine.setText(searchRequest)
     }
 
 
