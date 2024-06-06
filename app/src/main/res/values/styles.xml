@@ -12,6 +12,7 @@
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">@dimen/mainIcon_padding</item>
         <item name="iconTint">@color/main_icon_color</item>
+        <item name="android:elevation">0dp</item>
     </style>
 
     <style name="SettingViewButton" >

@@ -1,26 +1,36 @@
 package com.practicum.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 
 class SearchActivity : AppCompatActivity() {
-    @SuppressLint("MissingInflatedId")
+    private lateinit var lineSearchLine : EditText
+    private lateinit var comeBackMain : ImageView
+    private lateinit var clearButtonSearch : ImageView
+    private var inputMethodManager : InputMethodManager? = null
+    private var searchRequest : String = ""
+
+            @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        val comeBackMain = findViewById<ImageView>(R.id.arrow_back)
-        val lineSearchLine = findViewById<EditText>(R.id.editText)
-        val clearButtonSearch = findViewById<ImageView>(R.id.clearIcon)
+         comeBackMain = findViewById(R.id.arrow_back)
+         lineSearchLine = findViewById(R.id.editText)
+         clearButtonSearch = findViewById(R.id.clearIcon)
 
         clearButtonSearch.setOnClickListener{
             lineSearchLine.setText("")
+            inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            inputMethodManager?.hideSoftInputFromWindow(lineSearchLine.windowToken, 0)
         }
         comeBackMain.setOnClickListener {
             finish()
@@ -51,8 +61,6 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private var searchRequest : String = ""
-
     companion object{
         const val SEARCH_REQUEST = "SEARCH_REQUEST"
         const val AMOUNT_DEF = ""
@@ -65,7 +73,6 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        val lineSearchLine = findViewById<EditText>(R.id.editText)
         searchRequest = savedInstanceState.getString(SEARCH_REQUEST,AMOUNT_DEF)
         lineSearchLine.setText(searchRequest)
     }
