@@ -30,16 +30,25 @@
 
         <Button style="@style/MainViewButton"
             android:id="@+id/main_button_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:text="@string/main_search"
             app:icon="@drawable/ic_search" />
 
         <Button style="@style/MainViewButton"
             android:id="@+id/main_button_media"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:text="@string/main_media"
             app:icon="@drawable/ic_media"/>
 
         <Button style="@style/MainViewButton"
             android:id="@+id/main_button_setting"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:text="@string/main_setting"
             app:icon="@drawable/ic_setting"/>
 

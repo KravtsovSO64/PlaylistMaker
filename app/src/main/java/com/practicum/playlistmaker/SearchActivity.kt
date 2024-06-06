@@ -1,14 +1,13 @@
 package com.practicum.playlistmaker
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 
 class SearchActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -34,6 +33,7 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearButtonSearch.visibility = clearButtonVisibility(s)
+                searchRequest = s.toString()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -50,4 +50,23 @@ class SearchActivity : AppCompatActivity() {
             View.VISIBLE
         }
     }
+
+    private var searchRequest : String = ""
+
+    companion object{
+        const val SEARCH_REQUEST = "SEARCH_REQUEST"
+        const val AMOUNT_DEF = ""
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(SEARCH_REQUEST,searchRequest)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        searchRequest = savedInstanceState.getString(SEARCH_REQUEST,AMOUNT_DEF)
+    }
+
+
 }
