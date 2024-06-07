@@ -2,12 +2,10 @@ package com.practicum.playlistmaker
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -18,7 +16,7 @@ class MainActivity : AppCompatActivity() {
         val buttonSearch = findViewById<Button>(R.id.main_button_search)
         val buttonMedia = findViewById<Button>(R.id.main_button_media)
         val buttonSetting = findViewById<Button>(R.id.main_button_setting)
-        val arrowBack = findViewById<ImageView>(R.id.arrow_back)
+
 
         val buttClickListener : View.OnClickListener = object : View.OnClickListener{
             override fun onClick(v: View?) {

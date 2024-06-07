@@ -12,5 +12,6 @@
     <dimen name="settingIcon_marginEnd">24dp</dimen>
     <dimen name="settingPadding">12dp</dimen>
     <dimen name="settingBar_marginTop">8dp</dimen>
+    <dimen name="size_arrow_back">48dp</dimen>
 
 </resources>

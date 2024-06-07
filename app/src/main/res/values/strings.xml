@@ -6,6 +6,11 @@
     <string name="user_agreement">Пользовательское соглашение</string>
     <string name="share_app">Поделиться приложением</string>
     <string name="write_support">Написать в поддержку</string>
-    <string name="dark_view">Тёмная тема</string>
+    <string name="dark_view">Темная тема</string>
+    <string name="shareApp">https://practicum.yandex.ru/</string>
+    <string name="supportMail">kraffc@yandex.ru</string>
+    <string name="supportTitleMessage">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="supportMessage">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="userAgreement">https://yandex.ru/legal/practicum_offer/</string>
 
 </resources>
