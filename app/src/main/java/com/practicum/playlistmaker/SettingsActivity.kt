@@ -1,23 +1,23 @@
 package com.practicum.playlistmaker
 
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.FrameLayout
-import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
+import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
 
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var binding : ActivitySettingsBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val arrowBack = findViewById<ImageView>(R.id.arrow_back)
-        val shareButton = findViewById<FrameLayout>(R.id.share)
-        val supportButton =findViewById<FrameLayout>(R.id.support)
-        val arrowButton = findViewById<FrameLayout>(R.id.arrow)
+        val arrowBack = binding.arrowBack
+        val shareButton = binding.share
+        val supportButton =binding.support
+        val arrowButton = binding.arrow
 
 
         supportButton.setOnClickListener{
@@ -36,18 +36,14 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         shareButton.setOnClickListener{
-            val shareButton = Intent(Intent.ACTION_SEND)
-            shareButton.setType("text/plain")
-            shareButton.putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.shareApp))
-            startActivity(Intent.createChooser(shareButton, ""))
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.setType("text/plain")
+            shareIntent.putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.shareApp))
+            startActivity(Intent.createChooser(shareIntent, ""))
         }
 
         arrowBack.setOnClickListener {
             finish()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 }

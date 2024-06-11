@@ -4,18 +4,20 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.practicum.playlistmaker.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding : ActivityMainBinding
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val buttonSearch = findViewById<Button>(R.id.main_button_search)
-        val buttonMedia = findViewById<Button>(R.id.main_button_media)
-        val buttonSetting = findViewById<Button>(R.id.main_button_setting)
+        val buttonSearch = binding.mainButtonSearch
+        val buttonMedia = binding.mainButtonMedia
+        val buttonSetting = binding.mainButtonSetting
 
 
         val buttClickListener : View.OnClickListener = object : View.OnClickListener{
