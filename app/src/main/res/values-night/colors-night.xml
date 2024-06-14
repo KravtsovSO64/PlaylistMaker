@@ -10,6 +10,4 @@
     <color name="setting_icon_color">#FFFFFF</color>
     <color name="search_line">#FFFFFF</color>
     <color name="search_line_content">#1A1B22</color>
-    <color name="search_holder_trackName">#FFFFFF</color>
-    <color name="search_holder_artistName">#FFFFFF</color>
 </resources>
