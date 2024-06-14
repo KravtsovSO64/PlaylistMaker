@@ -13,5 +13,6 @@
     <dimen name="settingPadding">12dp</dimen>
     <dimen name="settingBar_marginTop">8dp</dimen>
     <dimen name="size_arrow_back">48dp</dimen>
+    <dimen name="searchText_size">12sp</dimen>
 
 </resources>
