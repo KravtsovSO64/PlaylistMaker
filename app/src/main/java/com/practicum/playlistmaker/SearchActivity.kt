@@ -10,8 +10,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 
 class SearchActivity : AppCompatActivity() {
@@ -21,7 +19,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var lineSearchLine : EditText
     private lateinit var comeBackMain : ImageView
     private lateinit var clearButtonSearch : ImageView
-    private lateinit var recyclerTrack : RecyclerView
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,22 +29,6 @@ class SearchActivity : AppCompatActivity() {
         clearButtonSearch = binding.clearIcon
         comeBackMain = binding.arrowBack
         lineSearchLine = binding.editText
-        recyclerTrack = binding.trackList
-
-        recyclerTrack.layoutManager = LinearLayoutManager(this)
-        val trackAdapter = TrackAdapter(
-            listOf(
-                Track("Smells Like Teen Spirit", "Nirvana", "5:01", resources.getString(R.string.track_one)),
-                Track("Billie Jean","Michael Jackson","4:35", resources.getString(R.string.track_two)),
-                Track("Stayin' Alive","Bee Gees","4:10", resources.getString(R.string.track_three)),
-                Track("Whole Lotta Love","Led Zeppelin","5:33", resources.getString(R.string.track_four)),
-                Track("Sweet Child O'Mine","Guns N' Roses","5:03", resources.getString(R.string.track_five)),
-            )
-        )
-        recyclerTrack.adapter = trackAdapter
-
-
-        recyclerTrack.adapter = trackAdapter
 
         clearButtonSearch.setOnClickListener {
             lineSearchLine.setText("")
