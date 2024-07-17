@@ -15,4 +15,6 @@
     <string name="noFoundСontent">Ничего не нашлось</string>
     <string name="noInternetСontent">Проблема со связью\n\nЗагрузка не удалась. Проверьте\nподключение к интернету</string>
     <string name="buttonUpdateSearch">Обновить</string>
+    <string name="buttonClearHistory">Очистить историю</string>
+    <string name="hintMessage">Вы искали</string>
 </resources>

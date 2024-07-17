@@ -18,7 +18,10 @@ class SettingsActivity : AppCompatActivity() {
         val shareButton = binding.share
         val supportButton =binding.support
         val arrowButton = binding.arrow
+        val themeSwitcher = binding.themeSwitcher
 
+        themeSwitcher.isChecked = getSharedPreferences(THEME_APP, MODE_PRIVATE)
+            .getBoolean(KEY_THEME_APP, false)
 
         supportButton.setOnClickListener{
             val supportIntent = Intent(Intent.ACTION_SENDTO)
@@ -45,5 +48,15 @@ class SettingsActivity : AppCompatActivity() {
         arrowBack.setOnClickListener {
             finish()
         }
+
+        themeSwitcher.setOnCheckedChangeListener { switcher, isChecked ->
+            (applicationContext as App).switchTheme(isChecked)
+        }
     }
+
+    companion object {
+        const val THEME_APP = "THEME_APP"
+        const val KEY_THEME_APP = "KEY_THEME_APP"
+    }
+
 }
