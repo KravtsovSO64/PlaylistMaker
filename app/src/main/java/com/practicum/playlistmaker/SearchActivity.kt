@@ -30,7 +30,6 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     private var searchRequest: String = ""
     private lateinit var binding: ActivitySearchBinding
     private lateinit var lineSearchLine: EditText
-    private lateinit var comeBackMain: ImageView
     private lateinit var clearButtonSearch: ImageView
     private lateinit var recyclerTrack: RecyclerView
     private lateinit var errorPoster: ImageView
@@ -62,7 +61,6 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         adapterTrackHistory.historyListAdapter = historySearch.getListHistory()
 
         clearButtonSearch = binding.clearIcon
-        comeBackMain = binding.arrowBack
         lineSearchLine = binding.editText
         recyclerTrack = binding.trackList
         errorPoster = binding.errorPoster
@@ -79,7 +77,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
             showErrorMessgage(0)
             showHistorySearchTract(lineSearchLine.hasFocus())
         }
-        comeBackMain.setOnClickListener {
+        binding.arrowBack.setOnClickListener {
             finish()
         }
 
@@ -105,7 +103,6 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         lineSearchLine.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 searchMusic()
-                true
             }
             false
         }
@@ -152,7 +149,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     }
 
     override fun onItemClick(position: Int) {
-        historySearch.addTrackToListHistory(adapterTrackSearch.searchListAdapter.get(position))
+        historySearch.addTrackToListHistory(adapterTrackSearch.searchListAdapter[position])
     }
 
 
