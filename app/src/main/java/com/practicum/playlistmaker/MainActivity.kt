@@ -15,26 +15,20 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val buttonSearch = binding.mainButtonSearch
-        val buttonMedia = binding.mainButtonMedia
-        val buttonSetting = binding.mainButtonSetting
 
-
-        val buttClickListener : View.OnClickListener = object : View.OnClickListener{
-            override fun onClick(v: View?) {
-                val searchIntent = Intent(this@MainActivity, SearchActivity::class.java)
-                startActivity(searchIntent)
-            }
+        val buttClickListener : View.OnClickListener = View.OnClickListener {
+            val searchIntent = Intent(this@MainActivity, SearchActivity::class.java)
+            startActivity(searchIntent)
         }
 
-        buttonSearch.setOnClickListener(buttClickListener)
+        binding.mainButtonSearch.setOnClickListener(buttClickListener)
 
-        buttonMedia.setOnClickListener {
+        binding.mainButtonMedia.setOnClickListener {
             val mediaIntent = Intent(this, MediaActivity::class.java)
             startActivity(mediaIntent)
         }
 
-        buttonSetting.setOnClickListener {
+        binding.mainButtonSetting.setOnClickListener {
             val settingIntent = Intent(this, SettingsActivity::class.java)
             startActivity(settingIntent)
         }
