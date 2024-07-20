@@ -149,7 +149,9 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     }
 
     override fun onItemClick(position: Int) {
+
         historySearch.addTrackToListHistory(adapterTrackSearch.searchListAdapter[position])
+
     }
 
 
