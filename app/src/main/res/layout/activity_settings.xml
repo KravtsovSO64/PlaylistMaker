@@ -53,10 +53,13 @@
                 android:text="@string/dark_view"/>
 
             <Switch
+                android:id="@+id/themeSwitcher"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:padding="@dimen/main_padding"
+                android:thumbTint="@color/switcher_color_first"
+                android:trackTint="@color/switcher_color_two"
                 tools:ignore="UseSwitchCompatOrMaterialXml"/>
         </FrameLayout>
 

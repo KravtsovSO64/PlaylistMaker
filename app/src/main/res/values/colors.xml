@@ -13,4 +13,6 @@
     <color name="search_holder_trackName">#000000</color>
     <color name="search_holder_artistName">#AEAFB4</color>
     <color name="update_button">#FFFFFF</color>
+    <color name="switcher_color_first">#AEAFB4</color>
+    <color name="switcher_color_two">#E6E8EB</color>
 </resources>

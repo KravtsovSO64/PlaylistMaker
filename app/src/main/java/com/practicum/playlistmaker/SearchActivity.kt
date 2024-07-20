@@ -2,6 +2,7 @@ package com.practicum.playlistmaker
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
@@ -17,15 +18,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     private val baseUrl = "https://itunes.apple.com"
     private var inputMethodManager: InputMethodManager? = null
     private var searchRequest: String = ""
@@ -37,19 +36,11 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var errorPoster: ImageView
     private lateinit var errorMessage: TextView
     private lateinit var buttonUpdateSearchMusic: Button
+    private lateinit var historySearch: HistorySearch
+    private lateinit var sharedPrefs: SharedPreferences
 
-    ////////////////////////////
-
-    private val interceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-
-    private val client = OkHttpClient.Builder()
-        .addInterceptor(interceptor)
-        .build()
-
-    ////////////////////////////
 
     private val retrofit = Retrofit.Builder()
-        .client(client)
         .baseUrl(baseUrl)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
@@ -57,14 +48,18 @@ class SearchActivity : AppCompatActivity() {
     private val musicService = retrofit.create(MusicApi::class.java)
 
     private val musicList = ArrayList<Track>()
-    private val adapter = TrackAdapter()
-
+    private val adapterTrackSearch = TrackAdapter(this) //адаптре для списка результата поиска треков
+    private val adapterTrackHistory = HistoryTrackAdapter() //адаптер для списка истории поиска треков
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sharedPrefs = getSharedPreferences(HISTORY_SEARCH, MODE_APPEND)
+        historySearch = HistorySearch(sharedPrefs)
+        adapterTrackHistory.historyListAdapter = historySearch.getListHistory()
 
         clearButtonSearch = binding.clearIcon
         comeBackMain = binding.arrowBack
@@ -75,16 +70,14 @@ class SearchActivity : AppCompatActivity() {
         buttonUpdateSearchMusic = binding.buttonUpdateSearchMusic
 
         recyclerTrack.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        adapter.musicAdapter = musicList
-        recyclerTrack.adapter = adapter
+
 
         clearButtonSearch.setOnClickListener {
             lineSearchLine.setText("")
             inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(lineSearchLine.windowToken, 0)
-            musicList.clear()
-            adapter.notifyDataSetChanged()
             showErrorMessgage(0)
+            showHistorySearchTract(lineSearchLine.hasFocus())
         }
         comeBackMain.setOnClickListener {
             finish()
@@ -96,8 +89,11 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s.isNullOrEmpty()) musicList.clear()
+                if (s.isNullOrEmpty()) showErrorMessgage(0)
                 clearButtonSearch.visibility = clearButtonVisibility(s)
                 searchRequest = s.toString()
+                showHistorySearchTract(lineSearchLine.hasFocus())
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -106,7 +102,6 @@ class SearchActivity : AppCompatActivity() {
 
         }
         lineSearchLine.addTextChangedListener(searchTextWatcher)
-
         lineSearchLine.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 searchMusic()
@@ -114,8 +109,15 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         }
+        lineSearchLine.setOnFocusChangeListener { _ , hasFocus ->
+            showHistorySearchTract(hasFocus)
+        }
         buttonUpdateSearchMusic.setOnClickListener{
             searchMusic()
+        }
+        binding.buttonClearHistory.setOnClickListener {
+            historySearch.clearTracksToListHistory()
+            showHistorySearchTract(lineSearchLine.hasFocus())
         }
 
     }
@@ -139,6 +141,21 @@ class SearchActivity : AppCompatActivity() {
         lineSearchLine.setText(searchRequest)
     }
 
+    override fun onResume() {
+        super.onResume()
+        historySearch.linkedList = historySearch.getListFromMemory(sharedPrefs)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        historySearch.setListToMemory(sharedPrefs)
+    }
+
+    override fun onItemClick(position: Int) {
+        historySearch.addTrackToListHistory(adapterTrackSearch.searchListAdapter.get(position))
+    }
+
+
     private fun searchMusic(){
         musicService.getMusic(lineSearchLine.text.toString())
             .enqueue(object : Callback<MusicResponce> {
@@ -149,7 +166,10 @@ class SearchActivity : AppCompatActivity() {
                             if (response.body()?.results?.isNotEmpty() == true) {
                                 musicList.clear()
                                 musicList.addAll(response.body()?.results!!)
-                                adapter.notifyDataSetChanged()
+                                recyclerTrack.adapter = adapterTrackSearch
+                                adapterTrackSearch.searchListAdapter = musicList
+                                adapterTrackSearch.notifyDataSetChanged()
+                                adapterTrackHistory.notifyDataSetChanged()
                                 showErrorMessgage(0)
                             } else {
                                 showErrorMessgage(1)
@@ -214,9 +234,24 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun showHistorySearchTract(hasFocus: Boolean) {
+        if (hasFocus && lineSearchLine.text.isEmpty() && historySearch.getListHistory().isNotEmpty()) {
+            binding.hintTextSearch.visibility = View.VISIBLE
+            binding.buttonClearHistory.visibility = View.VISIBLE
+            recyclerTrack.adapter = adapterTrackHistory
+        } else {
+            binding.hintTextSearch.visibility = View.GONE
+            binding.buttonClearHistory.visibility = View.GONE
+            recyclerTrack.adapter = adapterTrackSearch
+        }
+        adapterTrackHistory.historyListAdapter = historySearch.getListHistory()
+        adapterTrackHistory.notifyDataSetChanged()
+        adapterTrackSearch.notifyDataSetChanged()
+    }
 
     companion object {
         private const val SEARCH_REQUEST = "SEARCH_REQUEST"
         private const val AMOUNT_DEF = ""
+        private const val HISTORY_SEARCH = "history_search"
     }
 }
