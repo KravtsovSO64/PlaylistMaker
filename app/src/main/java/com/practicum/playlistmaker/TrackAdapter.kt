@@ -8,9 +8,8 @@ class TrackAdapter(private val listener : OnTrackClickListener) : RecyclerView.A
     var searchListAdapter = ArrayList<Track>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder = TrackViewHolder(parent)
 
-
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(searchListAdapter.get(position))
+        holder.bind(searchListAdapter[position])
         holder.itemView.setOnClickListener {
             listener.onItemClick(position)
         }
