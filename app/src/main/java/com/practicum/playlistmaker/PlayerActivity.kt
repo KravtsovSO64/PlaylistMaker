@@ -16,8 +16,6 @@ class PlayerActivity: AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-
         binding.trackNamePlayer.text = intent.getStringExtra("trackName")
         binding.artistNamePlayer.text = intent.getStringExtra("artistName")
         binding.durationTrackPlayer.text = intent.getStringExtra("trackTimeMillis")
