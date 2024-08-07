@@ -2,6 +2,7 @@ package com.practicum.playlistmaker
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
@@ -48,7 +49,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
 
     private val musicList = ArrayList<Track>()
     private val adapterTrackSearch = TrackAdapter(this) //адаптре для списка результата поиска треков
-    private val adapterTrackHistory = HistoryTrackAdapter() //адаптер для списка истории поиска треков
+    private val adapterTrackHistory = HistoryTrackAdapter(this) //адаптер для списка истории поиска треков
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -149,8 +150,13 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     }
 
     override fun onItemClick(position: Int) {
-
-        historySearch.addTrackToListHistory(adapterTrackSearch.searchListAdapter[position])
+        if (recyclerTrack.adapter == adapterTrackSearch) {
+            val track = adapterTrackSearch.searchListAdapter[position]
+            parcelableTrack(track)
+            historySearch.addTrackToListHistory(track)
+        } else {
+            parcelableTrack(adapterTrackHistory.historyListAdapter[position])
+        }
 
     }
 
@@ -246,6 +252,19 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         adapterTrackHistory.historyListAdapter = historySearch.getListHistory()
         adapterTrackHistory.notifyDataSetChanged()
         adapterTrackSearch.notifyDataSetChanged()
+    }
+
+    private fun parcelableTrack(track: Track) {
+        val playerIntent = Intent(this, PlayerActivity::class.java)
+        playerIntent.putExtra("trackName", track.trackName)
+        playerIntent.putExtra("artistName", track.artistName)
+        playerIntent.putExtra("trackTimeMillis", track.getTrackTime())
+        playerIntent.putExtra("collectionName", track.collectionName)
+        playerIntent.putExtra("releaseDate", track.releaseDate)
+        playerIntent.putExtra("primaryGenreName", track.primaryGenreName)
+        playerIntent.putExtra("country", track.country)
+        playerIntent.putExtra("artworkUrl100",track.getCoverArtwork())
+        startActivity(playerIntent)
     }
 
     companion object {
