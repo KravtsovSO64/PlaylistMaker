@@ -17,4 +17,5 @@
     <color name="switcher_color_two">#E6E8EB</color>
     <color name="gray_color_text">#AEAFB4</color>
     <color name="background_button">#F56B6C</color>
+    <color name="colorProgressBar">#3772E7</color>
 </resources>

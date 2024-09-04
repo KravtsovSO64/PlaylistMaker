@@ -1,0 +1,91 @@
+[33m23d2490[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev[m[33m)[m HEAD@{0}: commit: v13.0 Домашнее задание спринт №13
+[33md2f6f20[m[33m ([m[1;32mMain[m[33m)[m HEAD@{1}: checkout: moving from Main to dev
+[33md2f6f20[m[33m ([m[1;32mMain[m[33m)[m HEAD@{2}: checkout: moving from dev to Main
+[33md2f6f20[m[33m ([m[1;32mMain[m[33m)[m HEAD@{3}: checkout: moving from Main to dev
+[33md2f6f20[m[33m ([m[1;32mMain[m[33m)[m HEAD@{4}: merge dev: Fast-forward
+[33m92867df[m[33m ([m[1;31mawesomeapp/dev[m[33m)[m HEAD@{5}: checkout: moving from dev to Main
+[33md2f6f20[m[33m ([m[1;32mMain[m[33m)[m HEAD@{6}: commit: v12.2 Домашнее задание спринт №12
+[33m92867df[m[33m ([m[1;31mawesomeapp/dev[m[33m)[m HEAD@{7}: checkout: moving from Main to dev
+[33m92867df[m[33m ([m[1;31mawesomeapp/dev[m[33m)[m HEAD@{8}: checkout: moving from dev to Main
+[33m92867df[m[33m ([m[1;31mawesomeapp/dev[m[33m)[m HEAD@{9}: checkout: moving from Main to dev
+[33m92867df[m[33m ([m[1;31mawesomeapp/dev[m[33m)[m HEAD@{10}: merge dev: Fast-forward
+[33m0c9af4a[m HEAD@{11}: checkout: moving from dev to Main
+[33m92867df[m[33m ([m[1;31mawesomeapp/dev[m[33m)[m HEAD@{12}: checkout: moving from Main to dev
+[33m0c9af4a[m HEAD@{13}: checkout: moving from dev to Main
+[33m92867df[m[33m ([m[1;31mawesomeapp/dev[m[33m)[m HEAD@{14}: commit (merge): v12.1 Домашнее задание спринт №12
+[33mabc76c6[m HEAD@{15}: commit: v12.0 Домашнее задание спринт №12
+[33m207b8e1[m HEAD@{16}: checkout: moving from Main to dev
+[33m0c9af4a[m HEAD@{17}: checkout: moving from dev to Main
+[33m207b8e1[m HEAD@{18}: checkout: moving from Main to dev
+[33m0c9af4a[m HEAD@{19}: reset: moving to HEAD
+[33m0c9af4a[m HEAD@{20}: pull --no-stat -v --progress origin Main: Fast-forward
+[33m3cf6839[m HEAD@{21}: checkout: moving from dev to Main
+[33m207b8e1[m HEAD@{22}: checkout: moving from Main to dev
+[33m3cf6839[m HEAD@{23}: checkout: moving from dev to Main
+[33m207b8e1[m HEAD@{24}: commit (merge): v11.0
+[33mea0ad29[m HEAD@{25}: commit: v10.3 Домашнее задание спринт №10
+[33m56d2379[m HEAD@{26}: commit: v10.2 Домашнее задание спринт №10
+[33m773fb45[m HEAD@{27}: commit: v10.1 Домашнее задание спринт №10
+[33m0fdfdc3[m HEAD@{28}: reset: moving to HEAD^
+[33mb5cd94a[m HEAD@{29}: revert: Revert "v10.1 Домашнее задание спринт №10"
+[33m0fdfdc3[m HEAD@{30}: commit: v10.1 Домашнее задание спринт №10
+[33m82e035f[m HEAD@{31}: commit: v10.1 Домашнее задание спринт №10
+[33m6f4c281[m HEAD@{32}: checkout: moving from Main to dev
+[33m6f4c281[m HEAD@{33}: merge dev: Fast-forward
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{34}: checkout: moving from dev to Main
+[33m6f4c281[m HEAD@{35}: commit: v9.6 добавлен ViewBinding для взаимодействия с View элементами.
+[33mdb6ceaf[m HEAD@{36}: checkout: moving from Main to dev
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{37}: reset: moving to HEAD
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{38}: checkout: moving from dev to Main
+[33mdb6ceaf[m HEAD@{39}: checkout: moving from Main to dev
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{40}: checkout: moving from remaster to Main
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{41}: checkout: moving from master to remaster
+[33md37b98c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{42}: checkout: moving from Main to master
+[33md37b98c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{43}: checkout: moving from master to Main
+[33md37b98c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{44}: checkout: moving from main to master
+[33mea6b923[m HEAD@{45}: checkout: moving from remaster to main
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{46}: checkout: moving from dev to remaster
+[33mdb6ceaf[m HEAD@{47}: checkout: moving from master to dev
+[33md37b98c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{48}: checkout: moving from dev to master
+[33mdb6ceaf[m HEAD@{49}: checkout: moving from master to dev
+[33md37b98c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{50}: checkout: moving from dev to master
+[33mdb6ceaf[m HEAD@{51}: checkout: moving from master to dev
+[33md37b98c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{52}: checkout: moving from main to master
+[33mea6b923[m HEAD@{53}: reset: moving to HEAD
+[33mea6b923[m HEAD@{54}: checkout: moving from dev to main
+[33mdb6ceaf[m HEAD@{55}: pull --no-stat -v --progress origin main: Fast-forward
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{56}: checkout: moving from main to dev
+[33mea6b923[m HEAD@{57}: reset: moving to HEAD
+[33mea6b923[m HEAD@{58}: reset: moving to HEAD
+[33mea6b923[m HEAD@{59}: checkout: moving from dev to main
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{60}: checkout: moving from main to dev
+[33mea6b923[m HEAD@{61}: checkout: moving from dev to main
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{62}: checkout: moving from main to dev
+[33mea6b923[m HEAD@{63}: checkout: moving from 433fcda4ac2550eec79d4974eb8dc23ff0b3b3b7 to main
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{64}: checkout: moving from dev to 433fcda4ac2550eec79d4974eb8dc23ff0b3b3b7
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{65}: checkout: moving from main to dev
+[33mea6b923[m HEAD@{66}: reset: moving to HEAD
+[33mea6b923[m HEAD@{67}: reset: moving to HEAD
+[33mea6b923[m HEAD@{68}: checkout: moving from dev to main
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{69}: checkout: moving from main to dev
+[33mea6b923[m HEAD@{70}: rebase (pick): Домашнее задание №9
+[33m5e1f3ba[m HEAD@{71}: rebase (pick): Новые изменения
+[33mddd1b3a[m HEAD@{72}: rebase (pick): Постарался исправить все замечания!
+[33mbff4c8f[m HEAD@{73}: rebase (pick): Постарался исправить все замечания!
+[33m7fa19af[m HEAD@{74}: rebase (continue): Hello, my friend! It is my first app!
+[33maa62053[m HEAD@{75}: checkout: moving from main to main
+[33maa62053[m HEAD@{76}: branch: Reset to origin/main
+[33maa62053[m HEAD@{77}: checkout: moving from dev to main
+[33m433fcda[m[33m ([m[1;31morigin/remaster[m[33m, [m[1;31mawesomeapp/remaster[m[33m)[m HEAD@{78}: commit: v9.5 небольшой рефакторинг кода
+[33ma3dd671[m HEAD@{79}: commit: v9.3 исправлено:
+[33m0ad31fb[m HEAD@{80}: commit: v9.2 (Исправлы поисковая строка, стили, сохранение данных) + добавил lineSearchLine.setText(searchRequest) в методе onRestoreInstanceState
+[33m377bd31[m HEAD@{81}: commit: v9.1 (Исправла поисковая строка, стили, сохранение данных)
+[33m5a03af6[m HEAD@{82}: checkout: moving from main to dev
+[33maa62053[m HEAD@{83}: checkout: moving from dev to main
+[33m5a03af6[m HEAD@{84}: checkout: moving from main to dev
+[33maa62053[m HEAD@{85}: merge res_1: Fast-forward
+[33m5a0ac74[m HEAD@{86}: checkout: moving from res_1 to main
+[33maa62053[m HEAD@{87}: checkout: moving from main to res_1
+[33m5a0ac74[m HEAD@{88}: checkout: moving from res_1 to main
+[33maa62053[m HEAD@{89}: merge main: Merge made by the 'ort' strategy.
+[33m3e213e5[m HEAD@{90}: checkout: moving 
