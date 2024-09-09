@@ -1,8 +1,5 @@
 package com.practicum.playlistmaker.searchMusic.data.dto
 
-import java.text.SimpleDateFormat
-import java.util.Locale
-
 data class TrackDto (val wrapperType : String,
                      val kind : String,
                      val artistId : Int,
@@ -34,12 +31,5 @@ data class TrackDto (val wrapperType : String,
                      val currency : String,
                      val primaryGenreName : String,
                      val contentAdvisoryRating : String,
-                     val isStreamable : Boolean) {
-    fun getCoverArtwork() = artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
-    fun getTrackTime(): String {
-        val formatTime = SimpleDateFormat("mm:ss", Locale.getDefault())
-        return formatTime.format(trackTimeMillis).toString()
-    }
-}
-
+                     val isStreamable : Boolean)
 

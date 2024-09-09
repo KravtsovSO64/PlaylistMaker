@@ -2,15 +2,12 @@ package com.practicum.playlistmaker.searchMusic.presentation.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -20,17 +17,15 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.practicum.playlistmaker.HistorySearch
-import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.HistoryTrackAdapter
-import com.practicum.playlistmaker.MusicResponce
-import com.practicum.playlistmaker.PlayerActivity
-import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.OnTrackClickListener
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.TrackAdapter
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.practicum.playlistmaker.searchMusic.Creator
+import com.practicum.playlistmaker.searchMusic.domain.api.HistoryRepository
+import com.practicum.playlistmaker.searchMusic.domain.entities.Track
+import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.HistoryTrackAdapter
+import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.OnTrackClickListener
+import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.TrackAdapter
+
 
 class SearchActivity : AppCompatActivity(), OnTrackClickListener {
 
@@ -43,16 +38,12 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     private lateinit var errorPoster: ImageView
     private lateinit var errorMessage: TextView
     private lateinit var buttonUpdateSearchMusic: Button
-    private lateinit var historySearch: HistorySearch
-    private lateinit var sharedPrefs: SharedPreferences
-
-
-    private val musicList = ArrayList<TrackDto>()
+    private lateinit var historySearch: HistoryRepository
+    private val musicList = ArrayList<Track>()
     private val adapterTrackSearch = TrackAdapter(this) //адаптре для списка результата поиска треков
     private val adapterTrackHistory = HistoryTrackAdapter(this) //адаптер для списка истории поиска треков
-
     private val handler = Handler(Looper.getMainLooper()) //Handler для передачи Runnable объектов в главный поток
-    private val searchResponce = Runnable { searchMusic() }
+    private val searchResponce = Runnable { Creator.provideMusicInteractor() }
     private var isClickAllowed = true
 
 
@@ -62,16 +53,15 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        sharedPrefs = getSharedPreferences(HISTORY_SEARCH, MODE_APPEND)
-        historySearch = HistorySearch(sharedPrefs)
-        adapterTrackHistory.historyListAdapter = historySearch.getListHistory()
-
         clearButtonSearch = binding.clearIcon
         lineSearchLine = binding.editText
         recyclerTrack = binding.trackList
         errorPoster = binding.errorPoster
         errorMessage = binding.errorMessage
         buttonUpdateSearchMusic = binding.buttonUpdateSearchMusic
+
+        historySearch = Creator.getHistorySearchMusic()
+        adapterTrackHistory.historyListAdapter = historySearch as ArrayList<Track>
 
         recyclerTrack.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
@@ -118,10 +108,10 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
             showHistorySearchTract(hasFocus)
         }
         buttonUpdateSearchMusic.setOnClickListener{
-            searchMusic()
+           TODO()
         }
         binding.buttonClearHistory.setOnClickListener {
-            historySearch.clearTracksToListHistory()
+            historySearch.clearHistory()
             showHistorySearchTract(false)
         }
 
@@ -148,22 +138,27 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
 
     override fun onResume() {
         super.onResume()
-        historySearch.linkedList = historySearch.getListFromMemory(sharedPrefs)
     }
 
     override fun onStop() {
         super.onStop()
-        historySearch.setListToMemory(sharedPrefs)
+        historySearch.setListToMemory()
     }
 
     override fun onItemClick(position: Int) {
        if (clickDebounce()){
            if (recyclerTrack.adapter == adapterTrackSearch) {
                val track = adapterTrackSearch.searchListAdapter[position]
+               /*
                parcelableTrack(track)
-               historySearch.addTrackToListHistory(track)
+
+                */
+               historySearch.addTrackToHistory(track)
            } else {
+               /*
                parcelableTrack(adapterTrackHistory.historyListAdapter[position])
+
+                */
            }
        }
     }
@@ -177,47 +172,6 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         return current
     }
 
-    private fun searchMusic(){
-        showErrorMessgage(0)
-        recyclerTrack.visibility = View.GONE
-        binding.progressBar.visibility = View.VISIBLE
-        musicService.getMusic(lineSearchLine.text.toString())
-            .enqueue(object : Callback<MusicResponce> {
-                override fun onResponse(call: Call<MusicResponce>,
-                                        response: Response<MusicResponce>) {
-                    when (response.code()) {
-                        200 -> {
-                            if (response.body()?.results?.isNotEmpty() == true) {
-                                musicList.clear()
-                                musicList.addAll(response.body()?.results!!)
-                                recyclerTrack.adapter = adapterTrackSearch
-                                adapterTrackSearch.searchListAdapter = musicList
-                                adapterTrackSearch.notifyDataSetChanged()
-                                adapterTrackHistory.notifyDataSetChanged()
-                                showErrorMessgage(0)
-                            } else {
-                                showErrorMessgage(1)
-                            }
-
-                        }
-                        401 ->  {
-                            showErrorMessgage(2)
-                        }
-                    }
-
-                }
-
-                override fun onFailure(call: Call<MusicResponce>, t: Throwable) {
-                    showErrorMessgage(2)
-                    when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES){
-                        true -> errorPoster.setImageResource(R.drawable.ic_no_internet_dark)
-                        else -> errorPoster.setImageResource(R.drawable.ic_no_internet_ligth)
-                    }
-                }
-
-            })
-
-    }
 
     private fun searchDebounce(isSearchAllowed : Boolean){
         if (isSearchAllowed) {
@@ -281,25 +235,27 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
             binding.buttonClearHistory.visibility = View.GONE
             recyclerTrack.adapter = adapterTrackSearch
         }
-        adapterTrackHistory.historyListAdapter = historySearch.getListHistory()
+        adapterTrackHistory.historyListAdapter = historySearch.getListHistory() as ArrayList<Track>
         adapterTrackHistory.notifyDataSetChanged()
         adapterTrackSearch.notifyDataSetChanged()
     }
-
-    private fun parcelableTrack(trackDto: TrackDto) {
+/*
+    private fun parcelableTrack(track: Track) {
         val playerIntent = Intent(this, PlayerActivity::class.java)
-        playerIntent.putExtra("trackName", trackDto.trackName)
-        playerIntent.putExtra("artistName", trackDto.artistName)
-        playerIntent.putExtra("trackTimeMillis", trackDto.getTrackTime())
-        playerIntent.putExtra("collectionName", trackDto.collectionName)
-        playerIntent.putExtra("releaseDate", trackDto.releaseDate)
-        playerIntent.putExtra("primaryGenreName", trackDto.primaryGenreName)
-        playerIntent.putExtra("country", trackDto.country)
-        playerIntent.putExtra("artworkUrl100",trackDto.getCoverArtwork())
-        playerIntent.putExtra("previewUrl", trackDto.previewUrl)
-        Log.e("SearchURL",trackDto.previewUrl)
+        playerIntent.putExtra("trackName", Track.trackName)
+        playerIntent.putExtra("artistName", Track.artistName)
+        playerIntent.putExtra("trackTimeMillis", Track.getTrackTime())
+        playerIntent.putExtra("collectionName", Track.collectionName)
+        playerIntent.putExtra("releaseDate", Track.releaseDate)
+        playerIntent.putExtra("primaryGenreName", Track.primaryGenreName)
+        playerIntent.putExtra("country", Track.country)
+        playerIntent.putExtra("artworkUrl100",Track.getCoverArtwork())
+        playerIntent.putExtra("previewUrl", Track.previewUrl)
         startActivity(playerIntent)
     }
+
+ */
+
 
     companion object {
         private const val SEARCH_REQUEST = "SEARCH_REQUEST"

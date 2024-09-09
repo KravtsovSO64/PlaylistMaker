@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.searchMusic.domain.entities.Track
 
 class TrackViewHolder(parentView : ViewGroup) :
     RecyclerView.ViewHolder(
@@ -18,7 +19,7 @@ class TrackViewHolder(parentView : ViewGroup) :
     private var trackTime: TextView = itemView.findViewById(R.id.track_time)
     private var artworkUrl100: ImageView = itemView.findViewById(R.id.album_cover)
 
-    fun bind(trackDto: TrackDto) {
+    fun bind(trackDto: Track) {
         trackName.text = trackDto.trackName
         artistName.text = trackDto.artistName
         trackTime.text = trackDto.getTrackTime()

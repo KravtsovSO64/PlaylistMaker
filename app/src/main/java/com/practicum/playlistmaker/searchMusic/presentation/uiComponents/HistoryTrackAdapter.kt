@@ -2,10 +2,11 @@ package com.practicum.playlistmaker.searchMusic.presentation.uiComponents
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.practicum.playlistmaker.searchMusic.domain.entities.Track
 
 class HistoryTrackAdapter(private val listener : OnTrackClickListener): RecyclerView.Adapter<TrackViewHolder>() {
 
-    var historyListAdapter = ArrayList<TrackDto>()
+    var historyListAdapter = ArrayList<Track>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder = TrackViewHolder(parent)
 
 
