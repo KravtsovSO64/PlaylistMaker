@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.searchMusic.domain.entities
 
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -14,9 +14,9 @@ data class Track(val trackName: String,
                  val country: String,
                  val previewUrl: String){
     fun getCoverArtwork() = artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
+
     fun getTrackTime(): String {
         val formatTime = SimpleDateFormat("mm:ss", Locale.getDefault())
         return formatTime.format(trackTimeMillis).toString()
     }
 }
-

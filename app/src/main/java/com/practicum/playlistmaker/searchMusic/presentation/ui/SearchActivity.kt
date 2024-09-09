@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.searchMusic.presentation.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -20,15 +20,20 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.practicum.playlistmaker.HistorySearch
+import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.HistoryTrackAdapter
+import com.practicum.playlistmaker.MusicResponce
+import com.practicum.playlistmaker.PlayerActivity
+import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.OnTrackClickListener
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.TrackAdapter
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity(), OnTrackClickListener {
-    private val baseUrl = "https://itunes.apple.com"
+
     private var inputMethodManager: InputMethodManager? = null
     private var searchRequest: String = ""
     private lateinit var binding: ActivitySearchBinding
@@ -42,14 +47,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     private lateinit var sharedPrefs: SharedPreferences
 
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val musicService = retrofit.create(MusicApi::class.java)
-
-    private val musicList = ArrayList<Track>()
+    private val musicList = ArrayList<TrackDto>()
     private val adapterTrackSearch = TrackAdapter(this) //адаптре для списка результата поиска треков
     private val adapterTrackHistory = HistoryTrackAdapter(this) //адаптер для списка истории поиска треков
 
@@ -288,18 +286,18 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         adapterTrackSearch.notifyDataSetChanged()
     }
 
-    private fun parcelableTrack(track: Track) {
+    private fun parcelableTrack(trackDto: TrackDto) {
         val playerIntent = Intent(this, PlayerActivity::class.java)
-        playerIntent.putExtra("trackName", track.trackName)
-        playerIntent.putExtra("artistName", track.artistName)
-        playerIntent.putExtra("trackTimeMillis", track.getTrackTime())
-        playerIntent.putExtra("collectionName", track.collectionName)
-        playerIntent.putExtra("releaseDate", track.releaseDate)
-        playerIntent.putExtra("primaryGenreName", track.primaryGenreName)
-        playerIntent.putExtra("country", track.country)
-        playerIntent.putExtra("artworkUrl100",track.getCoverArtwork())
-        playerIntent.putExtra("previewUrl", track.previewUrl)
-        Log.e("SearchURL",track.previewUrl)
+        playerIntent.putExtra("trackName", trackDto.trackName)
+        playerIntent.putExtra("artistName", trackDto.artistName)
+        playerIntent.putExtra("trackTimeMillis", trackDto.getTrackTime())
+        playerIntent.putExtra("collectionName", trackDto.collectionName)
+        playerIntent.putExtra("releaseDate", trackDto.releaseDate)
+        playerIntent.putExtra("primaryGenreName", trackDto.primaryGenreName)
+        playerIntent.putExtra("country", trackDto.country)
+        playerIntent.putExtra("artworkUrl100",trackDto.getCoverArtwork())
+        playerIntent.putExtra("previewUrl", trackDto.previewUrl)
+        Log.e("SearchURL",trackDto.previewUrl)
         startActivity(playerIntent)
     }
 

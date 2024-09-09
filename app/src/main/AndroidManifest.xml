@@ -19,7 +19,7 @@
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".SearchActivity"
+            android:name=".searchMusic.presentation.ui.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".SettingsActivity"

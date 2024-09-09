@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.practicum.playlistmaker.searchMusic.data.dto.TrackDto
 import java.util.LinkedList
 class HistorySearch(private val sharedPreferences: SharedPreferences) : AppCompatActivity() {
 
@@ -11,24 +12,24 @@ class HistorySearch(private val sharedPreferences: SharedPreferences) : AppCompa
     private val maxSizeList: Int = 10
 
 
-    fun getListHistory(): ArrayList<Track> {
+    fun getListHistory(): ArrayList<TrackDto> {
         return ArrayList(linkedList)
     }
 
-    fun addTrackToListHistory(track : Track){
+    fun addTrackToListHistory(trackDto : TrackDto){
             val iterator = linkedList.iterator()
             while (iterator.hasNext()) {
                 val item = iterator.next()
-                if (item.trackId == track.trackId) {
+                if (item.trackId == trackDto.trackId) {
                     iterator.remove()
                     break
                 }
             }
         if (linkedList.size < maxSizeList){
-            linkedList.addFirst(track)
+            linkedList.addFirst(trackDto)
         } else {
             linkedList.removeLast()
-            linkedList.addFirst(track)
+            linkedList.addFirst(trackDto)
         }
     }
 
@@ -37,10 +38,10 @@ class HistorySearch(private val sharedPreferences: SharedPreferences) : AppCompa
         linkedList.clear()
     }
 
-    fun getListFromMemory(sharedPreferences: SharedPreferences) : LinkedList<Track> {
+    fun getListFromMemory(sharedPreferences: SharedPreferences) : LinkedList<TrackDto> {
         val gson = Gson()
         val json = sharedPreferences.getString(KEY_HISTORY_SEARCH, null)
-        return gson.fromJson(json, object : TypeToken<LinkedList<Track>>() {}.type) ?: LinkedList<Track>()
+        return gson.fromJson(json, object : TypeToken<LinkedList<TrackDto>>() {}.type) ?: LinkedList<TrackDto>()
     }
 
     fun setListToMemory(sharedPreferences: SharedPreferences) {
