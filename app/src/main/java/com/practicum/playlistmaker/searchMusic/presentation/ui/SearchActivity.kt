@@ -19,15 +19,34 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
-import com.practicum.playlistmaker.searchMusic.Creator
-import com.practicum.playlistmaker.searchMusic.domain.api.HistoryRepository
-import com.practicum.playlistmaker.searchMusic.domain.entities.Track
+import com.practicum.playlistmaker.searchMusic.creator.Creator
+import com.practicum.playlistmaker.searchMusic.data.repositories.local.HistoryMusicRepositoryImpl
+import com.practicum.playlistmaker.searchMusic.domain.api.MusicInteractor
+import com.practicum.playlistmaker.searchMusic.domain.models.Track
+import com.practicum.playlistmaker.searchMusic.domain.usecases.GetHistoryMusicUseCase
+import com.practicum.playlistmaker.searchMusic.domain.usecases.RemoveHistoryMusicUseCase
+import com.practicum.playlistmaker.searchMusic.domain.usecases.SetHistoryMusicUseCase
 import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.HistoryTrackAdapter
 import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.OnTrackClickListener
 import com.practicum.playlistmaker.searchMusic.presentation.uiComponents.TrackAdapter
 
 
 class SearchActivity : AppCompatActivity(), OnTrackClickListener {
+
+    //Экземпляр репозитория, для работы со списком истории прослушаной музыки
+    private val historyMusicRepositoryImpl by lazy { HistoryMusicRepositoryImpl(context = applicationContext) }
+
+    //UseCase для получения списка истории прослушаной музыки
+    private val getHistoryMusicUseCase by lazy { GetHistoryMusicUseCase(repository = historyMusicRepositoryImpl) }
+
+    //UseCase для добавления песни в список истории прослушаной музыки
+    private val setHistoryMusicUseCase by lazy { SetHistoryMusicUseCase(repository = historyMusicRepositoryImpl) }
+
+    //UseCase для очистки списка истории прослушаной музыки
+    private val removeHistoryMusicUseCase by lazy { RemoveHistoryMusicUseCase(repository = historyMusicRepositoryImpl) }
+
+    //получаем итератор, который будем использовать для запросов музыки через ApiItunes
+    private val creator = Creator.provideMusicInteractor()
 
     private var inputMethodManager: InputMethodManager? = null
     private var searchRequest: String = ""
@@ -38,12 +57,14 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     private lateinit var errorPoster: ImageView
     private lateinit var errorMessage: TextView
     private lateinit var buttonUpdateSearchMusic: Button
-    private lateinit var historySearch: HistoryRepository
-    private val musicList = ArrayList<Track>()
+
+    //Набор переменных для работы с RecyclerView
+    private val musicListHistory = getHistoryMusicUseCase //при запуске активности получаем список истории треков
     private val adapterTrackSearch = TrackAdapter(this) //адаптре для списка результата поиска треков
     private val adapterTrackHistory = HistoryTrackAdapter(this) //адаптер для списка истории поиска треков
+
+    //Набор переменных для работы с многопоточностью
     private val handler = Handler(Looper.getMainLooper()) //Handler для передачи Runnable объектов в главный поток
-    private val searchResponce = Runnable { Creator.provideMusicInteractor() }
     private var isClickAllowed = true
 
 
@@ -60,12 +81,11 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         errorMessage = binding.errorMessage
         buttonUpdateSearchMusic = binding.buttonUpdateSearchMusic
 
-        historySearch = Creator.getHistorySearchMusic()
-        adapterTrackHistory.historyListAdapter = historySearch as ArrayList<Track>
 
+        adapterTrackHistory.historyListAdapter = musicListHistory as ArrayList<Track>
         recyclerTrack.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-
+        //Очищает поисковую строку
         clearButtonSearch.setOnClickListener {
             lineSearchLine.setText("")
             inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
@@ -74,8 +94,11 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
             showHistorySearchTract(lineSearchLine.hasFocus())
             it.visibility = View.GONE
         }
+
+        //Возвращает на прошлый экран
         binding.arrowBack.setOnClickListener { finish() }
 
+        //Наблюдает за изменениями в editeText
         val searchTextWatcher = object : TextWatcher {
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -84,17 +107,16 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s.isNullOrEmpty()){
-                    musicList.clear()
+                   adapterTrackSearch.searchListAdapter.clear()
                     showErrorMessgage(0)
-                    searchDebounce(false)
+                    searchDebounce(false, expression = s.toString())
                     showHistorySearchTract(lineSearchLine.hasFocus())
                 } else {
                     clearButtonSearch.visibility = clearButtonVisibility(s)
                     searchRequest = s.toString()
                     showHistorySearchTract(false)
-                    searchDebounce(true)
+                    searchDebounce(true, expression = s.toString())
                 }
-
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -102,21 +124,45 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
             }
 
         }
+
         lineSearchLine.addTextChangedListener(searchTextWatcher)
 
+        //Проверяет взаимодействуем ли мы (в Фокусе) с editeText, в зависимости от состояния показывает/скрывает историю
         lineSearchLine.setOnFocusChangeListener { _ , hasFocus ->
             showHistorySearchTract(hasFocus)
         }
+        //Повторяет поисковый запрос
         buttonUpdateSearchMusic.setOnClickListener{
-           TODO()
+           //Empty
         }
+
+        //Очищает историю прослушанных треков
         binding.buttonClearHistory.setOnClickListener {
-            historySearch.clearHistory()
+            removeHistoryMusicUseCase.execute()
             showHistorySearchTract(false)
         }
-
     }
 
+    //Поиск трека
+    private fun searchTrack(expression: String): Runnable {
+       return Runnable {
+            creator.searchTrack(expression, object : MusicInteractor.MusicConsumer {
+                override fun consumer(foundMusic: List<Track>) {
+                    handler.post {
+                        updateListUI(foundMusic)
+                    }
+                }
+            })
+        }
+    }
+
+    //Обновление списка найденных треков
+    private fun updateListUI(foundMusic: List<Track>){
+        adapterTrackSearch.searchListAdapter = foundMusic as ArrayList<Track>
+        adapterTrackSearch.notifyDataSetChanged()
+    }
+
+    //Решает вопрос, показывать или не показывать кнопку "очистить"
     fun clearButtonVisibility(s: CharSequence?): Int {
         return if (s.isNullOrEmpty()) {
             View.GONE
@@ -125,26 +171,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(SEARCH_REQUEST, searchRequest)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        searchRequest = savedInstanceState.getString(SEARCH_REQUEST, AMOUNT_DEF)
-        lineSearchLine.setText(searchRequest)
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        historySearch.setListToMemory()
-    }
-
+    //Отрабатывает нажатие на песню в списке
     override fun onItemClick(position: Int) {
        if (clickDebounce()){
            if (recyclerTrack.adapter == adapterTrackSearch) {
@@ -153,7 +180,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
                parcelableTrack(track)
 
                 */
-               historySearch.addTrackToHistory(track)
+              setHistoryMusicUseCase.execute(track)
            } else {
                /*
                parcelableTrack(adapterTrackHistory.historyListAdapter[position])
@@ -172,16 +199,17 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         return current
     }
 
-
-    private fun searchDebounce(isSearchAllowed : Boolean){
+    //Очередь поиска трека
+    private fun searchDebounce(isSearchAllowed : Boolean, expression: String){
         if (isSearchAllowed) {
-            handler.removeCallbacks(searchResponce)
-            handler.postDelayed(searchResponce, SEARCH_DEBOUNCE_DELAY)
+            handler.removeCallbacks(searchTrack(expression))
+            handler.postDelayed(searchTrack(expression), SEARCH_DEBOUNCE_DELAY)
         } else {
-            handler.removeCallbacks(searchResponce)
+            handler.removeCallbacks(searchTrack(expression))
         }
     }
 
+    //Решает вопрос какую ошибку показать пользователю
     private fun showErrorMessgage(status: Int){
         when (status) {
             0 ->{
@@ -225,8 +253,9 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         }
     }
 
+    //Решает вопрос показывать или не показывать историю прослушанных треков
     private fun showHistorySearchTract(hasFocus: Boolean) {
-        if (hasFocus && lineSearchLine.text.isEmpty() && historySearch.getListHistory().isNotEmpty()) {
+        if (hasFocus && lineSearchLine.text.isEmpty() && getHistoryMusicUseCase.execute().isNotEmpty()) {
             binding.hintTextSearch.visibility = View.VISIBLE
             binding.buttonClearHistory.visibility = View.VISIBLE
             recyclerTrack.adapter = adapterTrackHistory
@@ -235,7 +264,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
             binding.buttonClearHistory.visibility = View.GONE
             recyclerTrack.adapter = adapterTrackSearch
         }
-        adapterTrackHistory.historyListAdapter = historySearch.getListHistory() as ArrayList<Track>
+        adapterTrackHistory.historyListAdapter = getHistoryMusicUseCase.execute() as ArrayList<Track>
         adapterTrackHistory.notifyDataSetChanged()
         adapterTrackSearch.notifyDataSetChanged()
     }
@@ -255,12 +284,20 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     }
 
  */
+    override fun onSaveInstanceState(outState: Bundle) {
+    super.onSaveInstanceState(outState)
+    outState.putString(SEARCH_REQUEST, searchRequest)
+}
 
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        searchRequest = savedInstanceState.getString(SEARCH_REQUEST, AMOUNT_DEF)
+        lineSearchLine.setText(searchRequest)
+    }
 
     companion object {
         private const val SEARCH_REQUEST = "SEARCH_REQUEST"
         private const val AMOUNT_DEF = ""
-        private const val HISTORY_SEARCH = "history_search"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val SEARCH_DEBOUNCE_DELAY =  2000L
     }

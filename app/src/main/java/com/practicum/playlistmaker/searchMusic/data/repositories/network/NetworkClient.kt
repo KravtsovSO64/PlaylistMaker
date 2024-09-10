@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.searchMusic.data
+package com.practicum.playlistmaker.searchMusic.data.repositories.network
 
 import com.practicum.playlistmaker.searchMusic.data.dto.Response
 

@@ -1,11 +1,12 @@
-package com.practicum.playlistmaker.searchMusic.data
+package com.practicum.playlistmaker.searchMusic.data.repositories.network
 
 import com.practicum.playlistmaker.searchMusic.data.dto.TrackSearchRequest
 import com.practicum.playlistmaker.searchMusic.data.dto.TrackSearchResponse
-import com.practicum.playlistmaker.searchMusic.domain.api.MusicRepository
-import com.practicum.playlistmaker.searchMusic.domain.entities.Track
+import com.practicum.playlistmaker.searchMusic.domain.models.Track
+import com.practicum.playlistmaker.searchMusic.domain.repository.MusicRepository
 
-class TrackRepositoryImpl(private val networkClient: NetworkClient): MusicRepository {
+class MusicRepositoryImpl(private val networkClient: NetworkClient): MusicRepository {
+
     override fun searchMusic(expression: String): List<Track> {
         val response = networkClient.doRequest(TrackSearchRequest(expression))
 
@@ -26,4 +27,5 @@ class TrackRepositoryImpl(private val networkClient: NetworkClient): MusicReposi
             return emptyList()
         }
     }
+
 }

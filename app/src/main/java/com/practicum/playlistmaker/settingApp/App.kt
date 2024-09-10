@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.settingApp
 
 import android.app.Application
 import android.content.SharedPreferences
@@ -18,7 +18,8 @@ class App : Application() {
         super.onCreate()
         sharedPrefsTheme = getSharedPreferences(THEME_APP, MODE_PRIVATE)
 
-        darkTheme = sharedPrefsTheme.getBoolean(KEY_THEME_APP,
+        darkTheme = sharedPrefsTheme.getBoolean(
+            KEY_THEME_APP,
             getDefaultNightMode() != MODE_NIGHT_YES
         )
         switchTheme(darkTheme)

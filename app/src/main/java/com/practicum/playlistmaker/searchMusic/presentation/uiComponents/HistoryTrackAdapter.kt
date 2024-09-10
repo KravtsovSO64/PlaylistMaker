@@ -2,7 +2,7 @@ package com.practicum.playlistmaker.searchMusic.presentation.uiComponents
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.practicum.playlistmaker.searchMusic.domain.entities.Track
+import com.practicum.playlistmaker.searchMusic.domain.models.Track
 
 class HistoryTrackAdapter(private val listener : OnTrackClickListener): RecyclerView.Adapter<TrackViewHolder>() {
 

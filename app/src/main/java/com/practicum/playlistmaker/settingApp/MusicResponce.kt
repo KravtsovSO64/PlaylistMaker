@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.settingApp
 
 import com.practicum.playlistmaker.searchMusic.data.dto.TrackDto
 

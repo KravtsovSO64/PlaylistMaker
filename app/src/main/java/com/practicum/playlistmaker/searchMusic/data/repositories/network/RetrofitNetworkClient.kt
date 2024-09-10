@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.searchMusic.data.repositories.network
 
-import com.practicum.playlistmaker.searchMusic.data.NetworkClient
 import com.practicum.playlistmaker.searchMusic.data.dto.Response
 import com.practicum.playlistmaker.searchMusic.data.dto.TrackSearchRequest
 import retrofit2.Retrofit
