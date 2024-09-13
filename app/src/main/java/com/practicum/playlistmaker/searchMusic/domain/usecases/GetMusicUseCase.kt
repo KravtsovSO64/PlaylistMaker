@@ -1,14 +1,14 @@
 package com.practicum.playlistmaker.searchMusic.domain.usecases
 
-import com.practicum.playlistmaker.searchMusic.domain.api.MusicInteractor
-import com.practicum.playlistmaker.searchMusic.domain.repository.MusicRepository
+import com.practicum.playlistmaker.searchMusic.domain.api.MusicNetworkInteractor
+import com.practicum.playlistmaker.searchMusic.domain.repository.MusicNetworkRepository
 import java.util.concurrent.Executors
 
-
-class GetMusicUseCase(private val repository: MusicRepository): MusicInteractor{
+//Этот класс Реализация итерактора MusicNetworkInteractor
+class GetMusicUseCase(private val repository: MusicNetworkRepository): MusicNetworkInteractor{
     private val executor = Executors.newCachedThreadPool()
 
-    override fun searchTrack(expression: String, consumer: MusicInteractor.MusicConsumer) {
+    override fun searchTrack(expression: String, consumer: MusicNetworkInteractor.MusicConsumer) {
         executor.execute {
             consumer.consumer(repository.searchMusic(expression))
         }

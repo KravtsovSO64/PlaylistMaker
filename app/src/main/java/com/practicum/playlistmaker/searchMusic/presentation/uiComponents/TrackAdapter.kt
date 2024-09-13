@@ -7,6 +7,12 @@ import com.practicum.playlistmaker.searchMusic.domain.models.Track
 class TrackAdapter(private val listener : OnTrackClickListener) : RecyclerView.Adapter<TrackViewHolder>() {
 
     var searchListAdapter = ArrayList<Track>()
+
+    fun updateSearchList(list: List<Track>){
+        if (!list.isNullOrEmpty()) {
+            searchListAdapter = ArrayList<Track>(list)
+        }
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder = TrackViewHolder(parent)
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
