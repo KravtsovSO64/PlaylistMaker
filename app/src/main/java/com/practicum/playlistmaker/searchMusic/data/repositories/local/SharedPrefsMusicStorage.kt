@@ -15,7 +15,7 @@ class SharedPrefsMusicStorage(context: Context): LocalStorage {
 
     //Получить из локального хранилища список
     override fun getHistoryMusic(): List<TrackDto> {
-        return list.toList().map { track ->
+        return getListFromMemory(sharedPreferences).toList().map { track ->
             TrackDto(
                 trackName = track.trackName,
                 artistName = track.artistName,

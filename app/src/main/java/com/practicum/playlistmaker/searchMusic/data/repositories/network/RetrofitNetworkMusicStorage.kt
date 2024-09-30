@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.searchMusic.data.repositories.network
 
-import android.util.Log
 import com.practicum.playlistmaker.searchMusic.data.dto.Response
 import com.practicum.playlistmaker.searchMusic.data.dto.TrackSearchRequest
 import retrofit2.Retrofit
@@ -29,7 +28,5 @@ class RetrofitNetworkMusicStorage: NetworkStorage {
         } else {
             return Response().apply { resultCode = 400 }
         }
-
-        Log.d("Error 4", "Response received: ${Response().resultCode}") // Логируем ответ
     }
 }

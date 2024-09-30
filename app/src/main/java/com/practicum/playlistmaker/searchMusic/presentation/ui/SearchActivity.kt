@@ -2,13 +2,13 @@ package com.practicum.playlistmaker.searchMusic.presentation.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -41,7 +41,6 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     private lateinit var buttonUpdateSearchMusic: Button
 
     //Набор переменных для работы с RecyclerView
-    private lateinit var musicListHistory: Any //при запуске активности получаем список истории треков
     private val adapterTrackSearch = TrackAdapter(this) //адаптре для списка результата поиска треков
     private val adapterTrackHistory = HistoryTrackAdapter(this) //адаптер для списка истории поиска треков
 
@@ -57,10 +56,6 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-        musicListHistory = Creator.getHistory.execute()
-
-
         clearButtonSearch = binding.clearIcon
         lineSearchLine = binding.editText
         recyclerTrack = binding.trackList
@@ -69,8 +64,6 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         buttonUpdateSearchMusic = binding.buttonUpdateSearchMusic
 
 
-        adapterTrackHistory.historyListAdapter = musicListHistory as List<Track>
-        recyclerTrack.adapter = adapterTrackSearch
         recyclerTrack.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
 
@@ -95,9 +88,8 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                /*
                 if (s.isNullOrEmpty()){
-                   adapterTrackSearch.searchListAdapter = emptyList()
+                    adapterTrackSearch.searchListAdapter.clear()
                     showErrorMessgage(0)
                     searchDebounce(false)
                     showHistorySearchTract(lineSearchLine.hasFocus())
@@ -107,13 +99,6 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
                     showHistorySearchTract(false)
                     searchDebounce(true)
                 }
-
-                 */
-                clearButtonSearch.visibility = clearButtonVisibility(s)
-                searchRequest = s.toString()
-                showHistorySearchTract(false)
-                recyclerTrack.visibility = View.VISIBLE
-                searchDebounce(true)
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -140,28 +125,6 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         }
     }
 
-    //Поиск трека
-    private fun searchTrack(): Runnable {
-       return Runnable {
-           Creator.provideMusicInteractor().searchTrack(lineSearchLine.text.toString(), object : MusicNetworkInteractor.MusicConsumer {
-                override fun consumer(foundMusic: List<Track>) {
-                    handler.post {
-                        updateListUI(foundMusic)
-                    }
-                }
-            })
-        }
-    }
-
-    //Обновление списка найденных треков
-    private fun updateListUI(foundMusic: List<Track>){
-        adapterTrackSearch.updateSearchList(foundMusic)
-
-        recyclerTrack.adapter = adapterTrackSearch
-        Log.e("ERROR21", foundMusic.size.toString()) // Логируем ошибку
-        Log.e("ERROR1", adapterTrackSearch.searchListAdapter.size.toString()) // Логируем ошибку
-    }
-
     //Решает вопрос, показывать или не показывать кнопку "очистить"
     fun clearButtonVisibility(s: CharSequence?): Int {
         return if (s.isNullOrEmpty()) {
@@ -176,18 +139,38 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
        if (clickDebounce()){
            if (recyclerTrack.adapter == adapterTrackSearch) {
                val track = adapterTrackSearch.searchListAdapter[position]
-               /*
                parcelableTrack(track)
-
-                */
                Creator.setHistory.execute(track)
            } else {
-               /*
                parcelableTrack(adapterTrackHistory.historyListAdapter[position])
-
-                */
            }
        }
+    }
+
+    //Поиск трека
+    private fun searchTrack(): Runnable {
+        return Runnable {
+            showProgressBar(true)
+            Creator.provideMusicInteractor().searchTrack(lineSearchLine.text.toString(), object : MusicNetworkInteractor.MusicConsumer {
+                override fun consumer(foundMusic: List<Track>) {
+                    handler.post {
+                        showProgressBar(false)
+                        updateListUI(foundMusic)
+                    }
+                }
+
+            })
+        }
+    }
+
+    //Обновление списка найденных треков
+    private fun updateListUI(foundMusic: List<Track>){
+        adapterTrackSearch.updateSearchList(foundMusic)
+        recyclerTrack.adapter = adapterTrackSearch
+    }
+
+    private fun showProgressBar(show: Boolean) {
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private fun clickDebounce() : Boolean{
@@ -262,32 +245,25 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         if (hasFocus && lineSearchLine.text.isEmpty() && Creator.getHistory.execute().isNotEmpty()) {
             binding.hintTextSearch.visibility = View.VISIBLE
             binding.buttonClearHistory.visibility = View.VISIBLE
+            adapterTrackHistory.updateSearchList(Creator.getHistory.execute())
             recyclerTrack.adapter = adapterTrackHistory
+            adapterTrackHistory.notifyDataSetChanged()
         } else {
             binding.hintTextSearch.visibility = View.GONE
             binding.buttonClearHistory.visibility = View.GONE
+
             recyclerTrack.adapter = adapterTrackSearch
+            adapterTrackSearch.notifyDataSetChanged()
         }
-        adapterTrackHistory.historyListAdapter = Creator.getHistory.execute()
-        adapterTrackHistory.notifyDataSetChanged()
-        adapterTrackSearch.notifyDataSetChanged()
     }
-/*
+
     private fun parcelableTrack(track: Track) {
-        val playerIntent = Intent(this, PlayerActivity::class.java)
-        playerIntent.putExtra("trackName", Track.trackName)
-        playerIntent.putExtra("artistName", Track.artistName)
-        playerIntent.putExtra("trackTimeMillis", Track.getTrackTime())
-        playerIntent.putExtra("collectionName", Track.collectionName)
-        playerIntent.putExtra("releaseDate", Track.releaseDate)
-        playerIntent.putExtra("primaryGenreName", Track.primaryGenreName)
-        playerIntent.putExtra("country", Track.country)
-        playerIntent.putExtra("artworkUrl100",Track.getCoverArtwork())
-        playerIntent.putExtra("previewUrl", Track.previewUrl)
+        val playerIntent = Intent(this, PlayerActivity::class.java).apply {
+            putExtra("track", track)
+        }
         startActivity(playerIntent)
     }
 
- */
     override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
     outState.putString(SEARCH_REQUEST, searchRequest)
