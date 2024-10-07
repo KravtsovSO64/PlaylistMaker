@@ -67,7 +67,7 @@ class PlayerActivity : AppCompatActivity(), PlayerStatusListener {
     private fun setupUI() {
         binding.trackNamePlayer.text = track.trackName
         binding.artistNamePlayer.text = track.artistName
-        binding.durationTrackPlayer.text = track.trackTimeMillis.toString()
+        binding.durationTrackPlayer.text = formatDuration(track.trackTimeMillis).toString()
         binding.albumTrackPlayer.text = track.collectionName
         binding.releaseYearTrackPlayer.text = track.releaseDate?.let { getYearFromDate(it).toString() }
         binding.styleTrackPlayer.text = track.primaryGenreName
@@ -124,5 +124,11 @@ class PlayerActivity : AppCompatActivity(), PlayerStatusListener {
             PlayerStatus.PREPARING -> mediaPlayerIterator.resume()
             PlayerStatus.ERROR ->TODO()
         }
+    }
+
+    fun formatDuration(millis: Int): String {
+        val minutes = (millis / 1000) / 60
+        val seconds = (millis / 1000) % 60
+        return String.format("%02d:%02d", minutes, seconds)
     }
 }

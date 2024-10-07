@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
-import com.practicum.playlistmaker.settingApp.data.App
+import com.practicum.playlistmaker.searchMusic.creator.App
 import com.practicum.playlistmaker.settingApp.data.repositories.ThemePreferenceRepositoryImpl
 import com.practicum.playlistmaker.settingApp.domain.iterator.ThemeSwitcherInteractorImpl
 

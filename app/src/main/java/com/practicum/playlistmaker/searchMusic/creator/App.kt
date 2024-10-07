@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.settingApp.data
+package com.practicum.playlistmaker.searchMusic.creator
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
@@ -15,6 +15,8 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         sharedPrefsTheme = ThemePreferenceRepositoryImpl(this)
+
+        Creator.initApplication(this)
 
         darkTheme = sharedPrefsTheme.isDarkThemeEnabled()
         switchTheme(darkTheme)
