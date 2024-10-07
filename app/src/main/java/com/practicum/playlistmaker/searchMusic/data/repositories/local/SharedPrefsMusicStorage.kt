@@ -57,10 +57,14 @@ class SharedPrefsMusicStorage(context: Context): LocalStorage {
     }
 
     // получение списка localStorage
-    private fun getListFromMemory(sharedPreferences: SharedPreferences) : LinkedList<TrackDto> {
+    private fun getListFromMemory(sharedPreferences: SharedPreferences): LinkedList<TrackDto> {
         val gson = Gson()
         val json = sharedPreferences.getString(KEY_HISTORY_SEARCH, null)
-        return gson.fromJson(json, object : TypeToken<LinkedList<TrackDto>>() {}.type) ?: LinkedList<TrackDto>()
+        return if (json != null) {
+            gson.fromJson(json, object : TypeToken<LinkedList<TrackDto>>() {}.type) ?: LinkedList<TrackDto>()
+        } else {
+            LinkedList<TrackDto>()
+        }
     }
 
     // сохранение списка localStorage

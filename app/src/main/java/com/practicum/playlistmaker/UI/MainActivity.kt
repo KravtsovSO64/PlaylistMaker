@@ -7,7 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.practicum.playlistmaker.databinding.ActivityMainBinding
 import com.practicum.playlistmaker.searchMusic.presentation.ui.SearchActivity
-import com.practicum.playlistmaker.settingApp.SettingsActivity
+import com.practicum.playlistmaker.settingApp.presentation.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding : ActivityMainBinding
