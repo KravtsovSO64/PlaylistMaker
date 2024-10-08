@@ -12,15 +12,21 @@ import com.practicum.playlistmaker.searchMusic.domain.repository.MediaPlayerRepo
 import com.practicum.playlistmaker.searchMusic.domain.repository.MusicLocalRepository
 import com.practicum.playlistmaker.searchMusic.domain.repository.MusicNetworkRepository
 import com.practicum.playlistmaker.searchMusic.domain.usecases.GetHistoryMusicUseCase
-import com.practicum.playlistmaker.searchMusic.domain.usecases.GetMusicUseCase
 import com.practicum.playlistmaker.searchMusic.domain.usecases.MediaPlayerIteratorImpl
+import com.practicum.playlistmaker.searchMusic.domain.usecases.MusicNetworkInteractorImpl
 import com.practicum.playlistmaker.searchMusic.domain.usecases.RemoveHistoryMusicUseCase
 import com.practicum.playlistmaker.searchMusic.domain.usecases.SetHistoryMusicUseCase
+import com.practicum.playlistmaker.settingApp.data.repositories.ThemePreferenceRepositoryImpl
+import com.practicum.playlistmaker.settingApp.domain.api.ThemeSwitcherIteractor
+import com.practicum.playlistmaker.settingApp.domain.iterator.ThemeSwitcherIteractorImpl
+import com.practicum.playlistmaker.settingApp.domain.repository.ThemePreferenceRepository
 
 object Creator {
 
     // Замените lateinit на обычное свойство, которое заполняется только при инициализации
     private lateinit var application: Application
+    const val SEARCH_REQUEST = "SEARCH_REQUEST"
+    const val AMOUNT_DEF = ""
 
     // Поставщик сетевого хранилища
     private fun getMusicNetworkRepository(): MusicNetworkRepository {
@@ -38,7 +44,7 @@ object Creator {
     }
 
     fun provideMusicInteractor(): MusicNetworkInteractor {
-        return GetMusicUseCase(getMusicNetworkRepository())
+        return MusicNetworkInteractorImpl(getMusicNetworkRepository())
     }
 
     private fun getMediaPlayerRepository(): MediaPlayerRepository {
@@ -49,10 +55,17 @@ object Creator {
         return MediaPlayerIteratorImpl(getMediaPlayerRepository())
     }
 
+    private fun getThemePreferenceRepository(): ThemePreferenceRepository {
+        return ThemePreferenceRepositoryImpl(application)
+    }
+
+    fun provideThemePreferenceIterator(): ThemeSwitcherIteractor {
+        return ThemeSwitcherIteractorImpl(getThemePreferenceRepository())
+    }
+
 
     // Используйте lazy для инициализации репозиториев только при необходимости
     val getHistory: GetHistoryMusicUseCase by lazy { GetHistoryMusicUseCase(getMusicLocalRepository()) }
     val setHistory: SetHistoryMusicUseCase by lazy { SetHistoryMusicUseCase(getMusicLocalRepository()) }
     val removeHistory: RemoveHistoryMusicUseCase by lazy { RemoveHistoryMusicUseCase(getMusicLocalRepository()) }
-
 }

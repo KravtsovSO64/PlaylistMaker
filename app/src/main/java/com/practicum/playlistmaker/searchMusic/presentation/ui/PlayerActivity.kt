@@ -58,6 +58,7 @@ class PlayerActivity : AppCompatActivity(), PlayerStatusListener {
 
         binding.arrowBackPlayer.setNavigationOnClickListener {
             mediaPlayerIterator.stop()
+            mainThreadHandler.removeCallbacksAndMessages(null)
             finish()
         }
 
@@ -87,11 +88,13 @@ class PlayerActivity : AppCompatActivity(), PlayerStatusListener {
 
     override fun onPause() {
         super.onPause()
+        mediaPlayerIterator.pause()
         mainThreadHandler.removeCallbacksAndMessages(null)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        mediaPlayerIterator.stop()
         mainThreadHandler.removeCallbacksAndMessages(null)
     }
 
@@ -113,8 +116,14 @@ class PlayerActivity : AppCompatActivity(), PlayerStatusListener {
 
     override fun onPlayerStatusChanged(status: PlayerStatus) {
         when (status) {
-            PlayerStatus.PLAYING -> mediaPlayerIterator.isPlaying()
-            PlayerStatus.PAUSED -> mediaPlayerIterator.pause()
+            PlayerStatus.PLAYING -> {
+                mediaPlayerIterator.isPlaying()
+                binding.buttonPlayStopPlayer.setImageResource(R.drawable.ic_button_pause)
+            }
+            PlayerStatus.PAUSED -> {
+                mediaPlayerIterator.pause()
+                binding.buttonPlayStopPlayer.setImageResource(R.drawable.ic_button_play)
+            }
             PlayerStatus.STOPPED -> mediaPlayerIterator.stop()
             PlayerStatus.COMPLETED -> {
                 binding.buttonPlayStopPlayer.setImageResource(R.drawable.ic_button_play)
@@ -126,7 +135,7 @@ class PlayerActivity : AppCompatActivity(), PlayerStatusListener {
         }
     }
 
-    fun formatDuration(millis: Int): String {
+    private fun formatDuration(millis: Int): String {
         val minutes = (millis / 1000) / 60
         val seconds = (millis / 1000) % 60
         return String.format("%02d:%02d", minutes, seconds)

@@ -4,17 +4,18 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
-import com.practicum.playlistmaker.settingApp.data.repositories.ThemePreferenceRepositoryImpl
+import com.practicum.playlistmaker.settingApp.domain.api.ThemeSwitcherIteractor
 import kotlin.properties.Delegates
 
 
 class App : Application() {
     private var darkTheme by Delegates.notNull<Boolean>()
-    private lateinit var sharedPrefsTheme: ThemePreferenceRepositoryImpl
+    private lateinit var sharedPrefsTheme: ThemeSwitcherIteractor
 
     override fun onCreate() {
         super.onCreate()
-        sharedPrefsTheme = ThemePreferenceRepositoryImpl(this)
+        Creator.initApplication(this)
+        sharedPrefsTheme = Creator.provideThemePreferenceIterator()
 
         Creator.initApplication(this)
 
@@ -24,7 +25,7 @@ class App : Application() {
 
     fun switchTheme(darkThemeEnabled: Boolean) {
         darkTheme = darkThemeEnabled
-        sharedPrefsTheme.setDarkThemeEnabled(darkThemeEnabled)
+        sharedPrefsTheme.switchTheme(darkThemeEnabled)
 
         if (darkThemeEnabled) {
             setDefaultNightMode(MODE_NIGHT_YES)

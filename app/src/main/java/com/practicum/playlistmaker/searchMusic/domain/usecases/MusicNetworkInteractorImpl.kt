@@ -5,7 +5,7 @@ import com.practicum.playlistmaker.searchMusic.domain.repository.MusicNetworkRep
 import java.util.concurrent.Executors
 
 //Этот класс Реализация итерактора MusicNetworkInteractor
-class GetMusicUseCase(private val repository: MusicNetworkRepository): MusicNetworkInteractor{
+class MusicNetworkInteractorImpl(private val repository: MusicNetworkRepository): MusicNetworkInteractor{
     private val executor = Executors.newCachedThreadPool()
 
     override fun searchTrack(expression: String, consumer: MusicNetworkInteractor.MusicConsumer) {

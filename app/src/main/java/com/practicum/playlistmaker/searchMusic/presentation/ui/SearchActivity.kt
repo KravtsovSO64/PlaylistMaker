@@ -266,18 +266,16 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
 
     override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    outState.putString(SEARCH_REQUEST, searchRequest)
+    outState.putString(Creator.SEARCH_REQUEST, searchRequest)
 }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        searchRequest = savedInstanceState.getString(SEARCH_REQUEST, AMOUNT_DEF)
+        searchRequest = savedInstanceState.getString(Creator.SEARCH_REQUEST, Creator.AMOUNT_DEF)
         lineSearchLine.setText(searchRequest)
     }
 
     companion object {
-        private const val SEARCH_REQUEST = "SEARCH_REQUEST"
-        private const val AMOUNT_DEF = ""
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val SEARCH_DEBOUNCE_DELAY =  2000L
     }

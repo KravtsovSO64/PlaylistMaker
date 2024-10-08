@@ -7,22 +7,20 @@ import androidx.appcompat.app.AppCompatActivity
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
 import com.practicum.playlistmaker.searchMusic.creator.App
-import com.practicum.playlistmaker.settingApp.data.repositories.ThemePreferenceRepositoryImpl
-import com.practicum.playlistmaker.settingApp.domain.iterator.ThemeSwitcherInteractorImpl
-
+import com.practicum.playlistmaker.searchMusic.creator.Creator
+import com.practicum.playlistmaker.settingApp.domain.api.ThemeSwitcherIteractor
 
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var themeSwitcher: ThemeSwitcherInteractorImpl
+    private lateinit var themeSwitcher: ThemeSwitcherIteractor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val themePreferenceManager = ThemePreferenceRepositoryImpl(this)
-        themeSwitcher = ThemeSwitcherInteractorImpl(themePreferenceManager)
+        themeSwitcher = Creator.provideThemePreferenceIterator()
 
         setupUI()
     }
