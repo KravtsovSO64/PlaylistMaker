@@ -259,7 +259,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
 
     private fun parcelableTrack(track: Track) {
         val playerIntent = Intent(this, PlayerActivity::class.java).apply {
-            putExtra("track", track)
+            putExtra(Creator.TRACK, track)
         }
         startActivity(playerIntent)
     }

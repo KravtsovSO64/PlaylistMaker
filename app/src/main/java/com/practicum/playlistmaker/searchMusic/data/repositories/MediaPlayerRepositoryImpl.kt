@@ -5,11 +5,12 @@ import com.practicum.playlistmaker.searchMusic.domain.api.PlayerStatus
 import com.practicum.playlistmaker.searchMusic.domain.api.PlayerStatusListener
 import com.practicum.playlistmaker.searchMusic.domain.repository.MediaPlayerRepository
 
-class MediaPlayerRepositoryImpl(var isTrackFinished: Boolean) : MediaPlayerRepository {
+class MediaPlayerRepositoryImpl() : MediaPlayerRepository {
 
     private val mediaPlayer: MediaPlayer = MediaPlayer()
     private var currentAudioUrl: String? = null
     private var playerStatusListener: PlayerStatusListener? = null
+    private var isTrackFinished: Boolean = false
 
 
     init {

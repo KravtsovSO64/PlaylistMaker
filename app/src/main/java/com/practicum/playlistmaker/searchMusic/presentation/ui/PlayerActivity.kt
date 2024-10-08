@@ -31,7 +31,7 @@ class PlayerActivity : AppCompatActivity(), PlayerStatusListener {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        track = intent.getParcelableExtra("track")
+        track = intent.getParcelableExtra(Creator.TRACK)
             ?: throw IllegalArgumentException("Track data required")
 
         val audioUrl = track.previewUrl

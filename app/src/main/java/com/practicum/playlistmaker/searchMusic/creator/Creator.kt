@@ -27,6 +27,7 @@ object Creator {
     private lateinit var application: Application
     const val SEARCH_REQUEST = "SEARCH_REQUEST"
     const val AMOUNT_DEF = ""
+    const val TRACK = "track"
 
     // Поставщик сетевого хранилища
     private fun getMusicNetworkRepository(): MusicNetworkRepository {
@@ -48,7 +49,7 @@ object Creator {
     }
 
     private fun getMediaPlayerRepository(): MediaPlayerRepository {
-        return MediaPlayerRepositoryImpl(isTrackFinished = false)
+        return MediaPlayerRepositoryImpl()
     }
 
     fun provideMediaPlayerInteractor(): MediaPlayerIterator {
