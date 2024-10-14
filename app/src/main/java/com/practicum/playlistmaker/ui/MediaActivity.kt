@@ -1,10 +1,9 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ImageView
+import com.practicum.playlistmaker.R
 
 class MediaActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
