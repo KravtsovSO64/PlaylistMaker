@@ -11,8 +11,8 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
-import com.practicum.playlistmaker.player.domain.api.MediaPlayerIterator
-import com.practicum.playlistmaker.player.presentation.PlayerViewModel
+import com.practicum.playlistmaker.player.presentation.state.PlayerState
+import com.practicum.playlistmaker.player.presentation.view.PlayerViewModel
 import com.practicum.playlistmaker.search.domain.models.Track
 import java.time.ZonedDateTime
 
@@ -20,11 +20,10 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var track: Track
-    private lateinit var mediaPlayerIterator: MediaPlayerIterator
     private lateinit var mainThreadHandler: Handler
     private lateinit var timer: TextView
     private val viewModel by lazy {
-        ViewModelProvider(this,PlayerViewModel.factory())[PlayerViewModel::class.java]
+        ViewModelProvider(this, PlayerViewModel.factory())[PlayerViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,17 +35,8 @@ class PlayerActivity : AppCompatActivity() {
         viewModel.setAudioUrl(track.previewUrl)
         mainThreadHandler = Handler(Looper.getMainLooper())
 
-        viewModel.isPlaying.observe(this) { status ->
-            if (status) {
-                binding.buttonPlayStopPlayer.setImageResource(R.drawable.ic_button_pause)
-            } else {
-                binding.buttonPlayStopPlayer.setImageResource(R.drawable.ic_button_play)
-            }
-
-        }
-
-        viewModel.currentPosition.observe(this) {
-            updateCurrentPosition(it)
+        viewModel.playerState.observe(this) { state ->
+            updateUI(state)
         }
 
         viewModel.setupListeners()
@@ -63,8 +53,15 @@ class PlayerActivity : AppCompatActivity() {
         setupUI()
     }
 
+    private fun updateUI(state: PlayerState) {
+        binding.buttonPlayStopPlayer.setImageResource(
+            if (state.isPlaying) R.drawable.ic_button_pause else R.drawable.ic_button_play
+        )
+        updateCurrentPosition(state.currentPosition)
+    }
+
     private fun getTrack(): Track {
-        return intent.getParcelableExtra(Creator.TRACK)
+        return intent.getSerializableExtra(Creator.TRACK) as? Track
             ?: throw IllegalArgumentException("Track data required")
     }
 
@@ -85,13 +82,12 @@ class PlayerActivity : AppCompatActivity() {
             .into(binding.placeHolderPlayer)
 
         timer = binding.trackElapsedTimePlayer
-
         binding.buttonPlayStopPlayer.setImageResource(R.drawable.ic_button_play)
     }
 
     override fun onPause() {
         super.onPause()
-        if (viewModel.isPlaying.value == true) viewModel.togglePlayback()
+        if (viewModel.playerState.value?.isPlaying == true) { viewModel.togglePlayback() }
         mainThreadHandler.removeCallbacksAndMessages(null)
     }
 
@@ -117,3 +113,4 @@ class PlayerActivity : AppCompatActivity() {
         return String.format("%02d:%02d", minutes, seconds)
     }
 }
+

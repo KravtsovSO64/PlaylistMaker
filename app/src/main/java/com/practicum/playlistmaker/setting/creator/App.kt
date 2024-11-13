@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import com.practicum.playlistmaker.creator.Creator
-import com.practicum.playlistmaker.setting.domain.usecases.ViewModelFactory
+import com.practicum.playlistmaker.setting.presentation.ViewModelFactory
 import com.practicum.playlistmaker.setting.presentation.ThemeViewModel
 
 

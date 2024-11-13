@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
-import com.practicum.playlistmaker.setting.domain.usecases.ViewModelFactory
+import com.practicum.playlistmaker.setting.presentation.ViewModelFactory
 import com.practicum.playlistmaker.setting.presentation.ThemeViewModel
 
 class SettingsActivity : AppCompatActivity() {

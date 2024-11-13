@@ -9,19 +9,10 @@ import com.practicum.playlistmaker.search.domain.repository.MusicNetworkReposito
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 
-class MusicNetworkRepositoryImpl() : MusicNetworkRepository {
-    private val baseUrl = "https://itunes.apple.com"
+class MusicNetworkRepositoryImpl(private val trackService: MusicApiService) : MusicNetworkRepository {
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val trackService = retrofit.create(MusicApiService::class.java)
 
     override fun searchMusic(expression: String, callback: (Result<List<Track>>) -> Unit) {
         // Выполняем сетевой запрос
@@ -30,7 +21,7 @@ class MusicNetworkRepositoryImpl() : MusicNetworkRepository {
                 if (response.isSuccessful && response.body() != null) {
                     val resultList = response.body()!!.results
                     val tracks = resultList.map { MapperTrackFromTrackDto().execute(it) } ?: emptyList()
-                    callback(Result.Success(tracks, response.code())) // правильное использование результата
+                    callback(Result.Success(tracks, response.code()))
                 } else {
                     callback(Result.Failure(response.code()))
                 }

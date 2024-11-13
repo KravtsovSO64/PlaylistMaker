@@ -4,12 +4,13 @@ import android.media.MediaPlayer
 import com.practicum.playlistmaker.player.domain.api.PlayerStatusListener
 import com.practicum.playlistmaker.player.domain.repository.MediaPlayerRepository
 
-class MediaPlayerRepositoryImpl(private var listener: PlayerStatusListener? = null) : MediaPlayerRepository {
+class MediaPlayerRepositoryImpl(
+    private var listener: PlayerStatusListener?,
+    private val mediaPlayer: MediaPlayer)
+    : MediaPlayerRepository {
 
-    private val mediaPlayer: MediaPlayer = MediaPlayer()
     private var currentAudioUrl: String? = null
     private var isTrackFinished: Boolean = false
-
 
     init {
         mediaPlayer.setOnCompletionListener {

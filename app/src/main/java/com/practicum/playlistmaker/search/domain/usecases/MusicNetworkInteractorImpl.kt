@@ -2,10 +2,9 @@ package com.practicum.playlistmaker.search.domain.usecases
 
 import com.practicum.playlistmaker.search.domain.api.MusicNetworkInteractor
 import com.practicum.playlistmaker.search.domain.repository.MusicNetworkRepository
-
 import java.util.concurrent.Executors
 
-//Этот класс Реализация итерактора MusicNetworkInteractor
+
 class MusicNetworkInteractorImpl(private val repository: MusicNetworkRepository) : MusicNetworkInteractor {
     private val executor = Executors.newCachedThreadPool()
 

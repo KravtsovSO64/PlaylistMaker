@@ -19,7 +19,7 @@ import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.player.ui.PlayerActivity
 import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.search.presentation.state.TrackSearchState
+import com.practicum.playlistmaker.search.presentation.state.TrackSearchViewState
 import com.practicum.playlistmaker.search.presentation.viewmodel.TrackSearchViewModel
 import com.practicum.playlistmaker.search.ui.uiComponents.HistoryTrackAdapter
 import com.practicum.playlistmaker.search.ui.uiComponents.OnTrackClickListener
@@ -55,24 +55,16 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
 
         viewModel.state.observe(this) { state ->
            render(state)
-        }
-
-        viewModel.listHistory.observe(this) {
-            viewModel.listHistory.value?.let { adapterTrackHistory.updateSearchList(it) }
+            if (state is TrackSearchViewState.History) { adapterTrackHistory.updateSearchList(state.tracks) }
         }
 
         binding.clearIcon.setOnClickListener {
-            binding.editText.setText("")
-            inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            inputMethodManager?.hideSoftInputFromWindow(binding.editText.windowToken, 0)
-            showErrorMessgage(0)
-            showHistorySearchTract(binding.editText.hasFocus())
+            clearSearchRequest()
             it.visibility = View.GONE
         }
 
         binding.arrowBack.setOnClickListener { finish() }
 
-        //Наблюдает за изменениями в editeText
         val searchTextWatcher = object : TextWatcher {
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -82,13 +74,13 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s.isNullOrEmpty()){
                     adapterTrackSearch.searchListAdapter.clear()
-                    showErrorMessgage(0)
+                    showErrorMessage(0)
                     viewModel.getListHistorySearchMusic()
                     showHistorySearchTract(binding.editText.hasFocus())
                     searchDebounce(false)
                 } else {
                     searchRequest = s.toString()
-                    showErrorMessgage(0)
+                    showErrorMessage(0)
                     showHistorySearchTract(false)
                     searchDebounce(true)
                 }
@@ -107,34 +99,44 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         binding.editText.setOnFocusChangeListener { _ , hasFocus ->
             showHistorySearchTract(hasFocus)
         }
-        //Повторяет поисковый запрос
+
         binding.buttonUpdateSearchMusic.setOnClickListener{
-            showErrorMessgage(0)
+            showErrorMessage(0)
             searchDebounce(true)
         }
 
-        //Очищает историю прослушанных треков
         binding.buttonClearHistory.setOnClickListener {
             viewModel.removeListHistorySearchMusic()
             showHistorySearchTract(false)
         }
     }
 
-    private fun render(state: TrackSearchState) {
+    private fun clearSearchRequest(){
+        binding.editText.setText("")
+        inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        inputMethodManager?.hideSoftInputFromWindow(binding.editText.windowToken, 0)
+        showErrorMessage(0)
+        showHistorySearchTract(binding.editText.hasFocus())
+    }
+
+    private fun render(state: TrackSearchViewState) {
         when (state) {
-            is TrackSearchState.Loading -> {
+            is TrackSearchViewState.Loading -> {
                 binding.trackList.visibility = View.GONE
                 showProgressLoading(true)
             }
-            is TrackSearchState.Error -> {
+            is TrackSearchViewState.Error -> {
                 binding.trackList.visibility = View.GONE
                 showProgressLoading(false)
-                showErrorMessgage(2)
+                showErrorMessage(2)
             }
-            is TrackSearchState.Content -> {
+            is TrackSearchViewState.Content -> {
                 binding.trackList.visibility = View.VISIBLE
                 showProgressLoading(false)
-                showUpdatedListTrack(state.data)
+                showUpdatedListTrack(state.tracks)
+            }
+            is TrackSearchViewState.History -> {
+                adapterTrackHistory.updateSearchList(state.tracks)
             }
         }
     }
@@ -144,7 +146,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     }
 
     private fun showUpdatedListTrack(list : List<Track>) {
-        if (!list.isNullOrEmpty()) adapterTrackSearch.updateSearchList(list) else showErrorMessgage(1)
+        if (!list.isNullOrEmpty()) adapterTrackSearch.updateSearchList(list) else showErrorMessage(1)
         adapterTrackSearch.notifyDataSetChanged()
     }
 
@@ -153,10 +155,10 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
        if (clickDebounce()){
            if (binding.trackList.adapter == adapterTrackSearch) {
                val track = adapterTrackSearch.searchListAdapter[position]
-               parcelableTrack(track)
+               serializableTrack(track)
                viewModel.setToListHistorySearchMusic(track)
            } else {
-               parcelableTrack(adapterTrackHistory.historyListAdapter[position])
+               serializableTrack(adapterTrackHistory.historyListAdapter[position])
            }
        }
     }
@@ -171,7 +173,6 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         return current
     }
 
-    //Очередь поиска трека
     private fun searchDebounce(isSearchAllowed : Boolean){
         adapterTrackSearch.searchListAdapter.clear()
         if (isSearchAllowed) {
@@ -183,7 +184,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         }
     }
 
-    private fun showErrorMessgage(status: Int){
+    private fun showErrorMessage(status: Int){
         when (status) {
             0 ->{
                 binding.buttonUpdateSearchMusic.visibility = View.GONE
@@ -241,7 +242,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
         }
     }
 
-    private fun parcelableTrack(track: Track) {
+    private fun serializableTrack(track: Track) {
         val playerIntent = Intent(this, PlayerActivity::class.java).apply {
             putExtra(Creator.TRACK, track)
         }

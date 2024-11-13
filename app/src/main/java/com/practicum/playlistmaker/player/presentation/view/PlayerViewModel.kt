@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.player.presentation
+package com.practicum.playlistmaker.player.presentation.view
 
 import android.os.Handler
 import android.os.Looper
@@ -10,47 +10,47 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.player.domain.api.PlayerStatusListener
+import com.practicum.playlistmaker.player.presentation.state.PlayerState
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerViewModel: ViewModel() {
-
-    private val _isPlaying = MutableLiveData<Boolean>().apply { value = false }
-    val isPlaying: LiveData<Boolean> get() = _isPlaying
-
-    private val _currentPosition = MutableLiveData<String>().apply { value = "00:00" }
-    val currentPosition: LiveData<String> get() = _currentPosition
-
-    private val _audioUrl = MutableLiveData<String>()
-    val audioUrl: LiveData<String> get() = _audioUrl
+class PlayerViewModel : ViewModel() {
+    private val _playerState = MutableLiveData<PlayerState>().apply { value = PlayerState() }
+    val playerState: LiveData<PlayerState> get() = _playerState
 
     private val iterator = Creator.provideMediaPlayerInteractor()
 
     fun setAudioUrl(url: String) {
-        _audioUrl.value = url
+        val currentState = _playerState.value ?: PlayerState()
+        _playerState.value = currentState.copy(audioUrl = url)
     }
 
     private fun play() {
-        _audioUrl.value?.let {
+        _playerState.value?.audioUrl?.let {
             iterator.play(it)
-            _isPlaying.value = true
+            val currentState = _playerState.value ?: PlayerState()
+            _playerState.value = currentState.copy(isPlaying = true)
             startUpdatingCurrentPosition()
         }
     }
 
     private fun pause() {
         iterator.pause()
-        _isPlaying.value = false
+        val currentState = _playerState.value ?: PlayerState()
+        _playerState.value = currentState.copy(isPlaying = false)
     }
 
     fun stop() {
-        _isPlaying.value = false
-        _currentPosition.value = "00:00"
         iterator.stop()
+        _playerState.value = PlayerState()
     }
 
     fun togglePlayback() {
-        if (_isPlaying.value == true) pause() else play()
+        if (_playerState.value?.isPlaying == true) {
+            pause()
+        } else {
+            play()
+        }
     }
 
     private fun startUpdatingCurrentPosition() {
@@ -58,7 +58,9 @@ class PlayerViewModel: ViewModel() {
         handler.post(object : Runnable {
             override fun run() {
                 if (iterator.isPlaying()) {
-                    _currentPosition.value = SimpleDateFormat("mm:ss", Locale.getDefault()).format(iterator.currentPosition())
+                    val currentTime = SimpleDateFormat("mm:ss", Locale.getDefault()).format(iterator.currentPosition())
+                    val currentState = _playerState.value ?: PlayerState()
+                    _playerState.value = currentState.copy(currentPosition = currentTime)
                 }
                 handler.postDelayed(this, 300)
             }
@@ -68,8 +70,8 @@ class PlayerViewModel: ViewModel() {
     fun setupListeners() {
         iterator.setupPlayerStatusListener(object : PlayerStatusListener {
             override fun onPlaybackCompleted() {
-                _isPlaying.value = false
-                _currentPosition.value = "00:00"
+                val currentState = _playerState.value ?: PlayerState()
+                _playerState.value = currentState.copy(isPlaying = false, currentPosition = "00:00")
             }
         })
     }

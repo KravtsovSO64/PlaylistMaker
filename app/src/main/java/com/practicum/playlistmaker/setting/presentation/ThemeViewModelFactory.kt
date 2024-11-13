@@ -1,9 +1,7 @@
-package com.practicum.playlistmaker.setting.domain.usecases
+package com.practicum.playlistmaker.setting.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-
-import com.practicum.playlistmaker.setting.presentation.ThemeViewModel
 
 
 class ViewModelFactory : ViewModelProvider.Factory {
