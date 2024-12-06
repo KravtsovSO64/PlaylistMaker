@@ -1,15 +1,14 @@
 package com.practicum.playlistmaker.search.data.repositories.local
 
-import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.practicum.playlistmaker.search.data.dto.TrackDto
 import java.util.LinkedList
 
-class SharedPrefsMusicStorage(context: Context): LocalStorage {
+class SharedPrefsMusicStorage(private val sharedPreferences: SharedPreferences,
+                              private val gson: Gson): LocalStorage {
 
-    private val sharedPreferences = context.getSharedPreferences(HISTORY_SEARCH, Context.MODE_PRIVATE)
     private var list = getListFromMemory(sharedPreferences)
     private val maxSizeList: Int = 10
 
@@ -56,9 +55,8 @@ class SharedPrefsMusicStorage(context: Context): LocalStorage {
         setListToMemory(sharedPreferences)
     }
 
-    // получение списка localStorage
+    //Получение списка localStorage
     private fun getListFromMemory(sharedPreferences: SharedPreferences): LinkedList<TrackDto> {
-        val gson = Gson()
         val json = sharedPreferences.getString(KEY_HISTORY_SEARCH, null)
         return if (json != null) {
             gson.fromJson(json, object : TypeToken<LinkedList<TrackDto>>() {}.type) ?: LinkedList<TrackDto>()
@@ -67,16 +65,15 @@ class SharedPrefsMusicStorage(context: Context): LocalStorage {
         }
     }
 
-    // сохранение списка localStorage
+    //Сохранить список localStorage
     private fun setListToMemory(sharedPreferences: SharedPreferences) {
-        val json = Gson().toJson(list)
+        val json = gson.toJson(list)
         sharedPreferences.edit()
             .putString(KEY_HISTORY_SEARCH, json)
             .apply()
     }
 
     companion object {
-        private const val HISTORY_SEARCH = "history_search"
         private const val KEY_HISTORY_SEARCH = "key_history_search"
     }
 }

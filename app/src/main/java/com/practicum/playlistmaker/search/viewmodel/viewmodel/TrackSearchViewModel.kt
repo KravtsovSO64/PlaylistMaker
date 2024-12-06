@@ -1,23 +1,21 @@
-package com.practicum.playlistmaker.search.presentation.viewmodel
+package com.practicum.playlistmaker.search.viewmodel.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.search.data.dto.Result
+import com.practicum.playlistmaker.search.domain.api.MusicLocalIterator
 import com.practicum.playlistmaker.search.domain.api.MusicNetworkInteractor
 import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.search.presentation.state.TrackSearchViewState
+import com.practicum.playlistmaker.search.viewmodel.state.TrackSearchViewState
 
-class TrackSearchViewModel : ViewModel() {
+class TrackSearchViewModel(
+    private val interactorNetwork: MusicNetworkInteractor,
+    private val iteratorLocal: MusicLocalIterator
+) : ViewModel() {
+
     private val _state = MutableLiveData<TrackSearchViewState>()
     val state: LiveData<TrackSearchViewState> get() = _state
-
-    private val interactorNetwork = Creator.provideMusicInteractor()
-    private val iteratorLocal = Creator.provideMusicLocalIterator()
 
     fun searchMusic(term: String) {
         _state.value = TrackSearchViewState.Loading
@@ -48,15 +46,5 @@ class TrackSearchViewModel : ViewModel() {
     fun removeListHistorySearchMusic() {
         iteratorLocal.remove()
         _state.postValue(TrackSearchViewState.History(iteratorLocal.get()))
-    }
-
-    companion object {
-        fun factory(): ViewModelProvider.Factory {
-            return viewModelFactory {
-                initializer {
-                    TrackSearchViewModel()
-                }
-            }
-        }
     }
 }

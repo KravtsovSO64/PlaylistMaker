@@ -12,18 +12,18 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.creator.Constants
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.player.ui.PlayerActivity
 import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.search.presentation.state.TrackSearchViewState
-import com.practicum.playlistmaker.search.presentation.viewmodel.TrackSearchViewModel
 import com.practicum.playlistmaker.search.ui.uiComponents.HistoryTrackAdapter
 import com.practicum.playlistmaker.search.ui.uiComponents.OnTrackClickListener
 import com.practicum.playlistmaker.search.ui.uiComponents.TrackAdapter
+import com.practicum.playlistmaker.search.viewmodel.state.TrackSearchViewState
+import com.practicum.playlistmaker.search.viewmodel.viewmodel.TrackSearchViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class SearchActivity : AppCompatActivity(), OnTrackClickListener {
@@ -31,9 +31,7 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
     private var inputMethodManager: InputMethodManager? = null
     private var searchRequest: String = ""
     private lateinit var binding: ActivitySearchBinding
-    private val viewModel by lazy {
-        ViewModelProvider(this, TrackSearchViewModel.factory())[TrackSearchViewModel::class.java]
-    }
+    private val viewModel by viewModel<TrackSearchViewModel>()
 
     private val adapterTrackSearch = TrackAdapter(listener = this)
     private val adapterTrackHistory = HistoryTrackAdapter(listener = this)
@@ -244,19 +242,19 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
 
     private fun serializableTrack(track: Track) {
         val playerIntent = Intent(this, PlayerActivity::class.java).apply {
-            putExtra(Creator.TRACK, track)
+            putExtra(Constants.TRACK, track)
         }
         startActivity(playerIntent)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    outState.putString(Creator.SEARCH_REQUEST, searchRequest)
+    outState.putString(Constants.SEARCH_REQUEST, searchRequest)
 }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        searchRequest = savedInstanceState.getString(Creator.SEARCH_REQUEST, Creator.AMOUNT_DEF)
+        searchRequest = savedInstanceState.getString(Constants.SEARCH_REQUEST, Constants.AMOUNT_DEF)
         binding.editText.setText(searchRequest)
     }
 

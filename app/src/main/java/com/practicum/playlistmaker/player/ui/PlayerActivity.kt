@@ -5,15 +5,15 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.creator.Constants
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
 import com.practicum.playlistmaker.player.presentation.state.PlayerState
 import com.practicum.playlistmaker.player.presentation.view.PlayerViewModel
 import com.practicum.playlistmaker.search.domain.models.Track
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.ZonedDateTime
 
 class PlayerActivity : AppCompatActivity() {
@@ -22,9 +22,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var track: Track
     private lateinit var mainThreadHandler: Handler
     private lateinit var timer: TextView
-    private val viewModel by lazy {
-        ViewModelProvider(this, PlayerViewModel.factory())[PlayerViewModel::class.java]
-    }
+    private val viewModel by viewModel<PlayerViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +59,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun getTrack(): Track {
-        return intent.getSerializableExtra(Creator.TRACK) as? Track
+        return intent.getSerializableExtra(Constants.TRACK) as? Track
             ?: throw IllegalArgumentException("Track data required")
     }
 
