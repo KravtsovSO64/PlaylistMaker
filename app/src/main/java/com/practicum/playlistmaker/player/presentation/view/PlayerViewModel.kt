@@ -5,20 +5,15 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.player.domain.api.MediaPlayerIterator
 import com.practicum.playlistmaker.player.domain.api.PlayerStatusListener
 import com.practicum.playlistmaker.player.presentation.state.PlayerState
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerViewModel : ViewModel() {
+class PlayerViewModel(private val iterator: MediaPlayerIterator) : ViewModel() {
     private val _playerState = MutableLiveData<PlayerState>().apply { value = PlayerState() }
     val playerState: LiveData<PlayerState> get() = _playerState
-
-    private val iterator = Creator.provideMediaPlayerInteractor()
 
     fun setAudioUrl(url: String) {
         val currentState = _playerState.value ?: PlayerState()
@@ -74,15 +69,5 @@ class PlayerViewModel : ViewModel() {
                 _playerState.value = currentState.copy(isPlaying = false, currentPosition = "00:00")
             }
         })
-    }
-
-    companion object {
-        fun factory(): ViewModelProvider.Factory {
-            return viewModelFactory {
-                initializer {
-                    PlayerViewModel()
-                }
-            }
-        }
     }
 }

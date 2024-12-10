@@ -3,19 +3,18 @@ package com.practicum.playlistmaker.setting.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
-import com.practicum.playlistmaker.setting.presentation.ViewModelFactory
 import com.practicum.playlistmaker.setting.presentation.ThemeViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
-    private val themeViewModel: ThemeViewModel by viewModels { ViewModelFactory() }
+    private val themeViewModel: ThemeViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +36,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun applyTheme(isDarkTheme: Boolean) {
-        if (isDarkTheme) setDefaultNightMode(MODE_NIGHT_YES) else setDefaultNightMode(MODE_NIGHT_NO)
+        setDefaultNightMode(if (isDarkTheme) MODE_NIGHT_YES else MODE_NIGHT_NO)
     }
 
     private fun sendSupportEmail() {
