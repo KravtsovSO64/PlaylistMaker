@@ -7,6 +7,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    single<ThemeSwitcherIteractor> { ThemeSwitcherIteractorImpl(get()) }
+    factory<ThemeSwitcherIteractor> { ThemeSwitcherIteractorImpl(get()) }
     viewModel { ThemeViewModel(get()) }
 }

@@ -11,8 +11,8 @@ import com.practicum.playlistmaker.setting.domain.usecases.ThemeSwitcherIteracto
 import org.koin.dsl.module
 
 val iteratorModule = module {
-    single<MusicLocalIterator> { MusicLocalIteratorImpl(get()) }
-    single<MusicNetworkInteractor> { MusicNetworkInteractorImpl(get()) }
-    single<MediaPlayerIterator> { MediaPlayerIteratorImpl(get()) }
-    single<ThemeSwitcherIteractor> { ThemeSwitcherIteractorImpl(get())  }
+    factory<MusicLocalIterator> { MusicLocalIteratorImpl(get()) }
+    factory<MusicNetworkInteractor> { MusicNetworkInteractorImpl(get()) }
+    factory<MediaPlayerIterator> { MediaPlayerIteratorImpl(get()) }
+    factory<ThemeSwitcherIteractor> { ThemeSwitcherIteractorImpl(get())  }
 }

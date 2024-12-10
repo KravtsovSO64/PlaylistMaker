@@ -12,8 +12,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    single<MusicLocalRepository> { MusicLocalRepositoryImpl(get()) }
-    single<MusicNetworkRepository> { MusicNetworkRepositoryImpl(get())  }
-    single<MediaPlayerRepository> { MediaPlayerRepositoryImpl(null, get()) }
-    single<ThemePreferenceRepository> { ThemePreferenceRepositoryImpl(androidContext()) }
+    factory<MusicLocalRepository> { MusicLocalRepositoryImpl(get()) }
+    factory<MusicNetworkRepository> { MusicNetworkRepositoryImpl(get())  }
+    factory<MediaPlayerRepository> { MediaPlayerRepositoryImpl(null, get()) }
+    factory<ThemePreferenceRepository> { ThemePreferenceRepositoryImpl(androidContext()) }
 }
