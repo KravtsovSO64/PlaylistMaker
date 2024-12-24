@@ -199,8 +199,8 @@ class SearchActivity : AppCompatActivity(), OnTrackClickListener {
                 binding.errorMessage.visibility = View.VISIBLE
                 binding.errorMessage.text =resources.getText(R.string.noFoundСontent)
                 when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES){
-                    true -> binding.errorPoster.setImageResource(R.drawable.ic_not_found_dark)
-                    else -> binding.errorPoster.setImageResource(R.drawable.ic_not_found_ligth)
+                    true -> binding.errorPoster.setImageResource(R.drawable.ic_not_found)
+                    else -> binding.errorPoster.setImageResource(R.drawable.ic_not_found)
                 }
             }
             2 -> {

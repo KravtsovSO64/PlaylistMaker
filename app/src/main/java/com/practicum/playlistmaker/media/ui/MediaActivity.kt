@@ -1,15 +1,36 @@
 package com.practicum.playlistmaker.media.ui
 
-import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.practicum.playlistmaker.R
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.tabs.TabLayoutMediator
+import com.practicum.playlistmaker.databinding.ActivityMediaBinding
 
 class MediaActivity : AppCompatActivity() {
-    @SuppressLint("MissingInflatedId")
+
+    private lateinit var binding: ActivityMediaBinding
+
+    private lateinit var tabMediator: TabLayoutMediator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_media)
+        binding = ActivityMediaBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
+        binding.pagerViewMedia.adapter = MediaViewPagerAdapter(supportFragmentManager, lifecycle)
+
+        binding.arrowBack.setOnClickListener { finish() }
+
+        tabMediator = TabLayoutMediator(binding.tabViewMedia, binding.pagerViewMedia) {tab, position  ->
+            when(position) {
+                0 -> tab.setText("Избранные треки")
+                else -> tab.setText("Плейлисты")
+            }
+        }
+        tabMediator.attach()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        tabMediator.detach()
     }
 }
