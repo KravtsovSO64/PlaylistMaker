@@ -20,4 +20,6 @@
     <string name="hintMessage">Вы искали</string>
     <string name="mediaFavoriteHolder">Ваша медиатека пуста</string>
     <string name="mediaPlaylistHolder">Вы не создали\nни одного плейлиста </string>
+    <string name="favoriteTrackTab">Избранные треки</string>
+    <string name="PlaylistTab">Плейлисты</string>
 </resources>

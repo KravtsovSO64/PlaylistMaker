@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="61dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:background="@color/backgroundApp">
 
     <FrameLayout
         android:layout_width="match_parent"
