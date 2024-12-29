@@ -15,4 +15,5 @@
     <color name="update_button">#1A1B22</color>
     <color name="switcher_color_first">#3F8AE0</color>
     <color name="switcher_color_two">#9FBBF3</color>
+    <color name="backgroundApp">#1A1B22</color>
 </resources>

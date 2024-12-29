@@ -57,6 +57,7 @@ dependencies {
     implementation ("io.insert-koin:koin-android:3.3.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
     implementation ("androidx.fragment:fragment-ktx:1.5.0")
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
     testImplementation("junit:junit:4.13.2")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.14.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

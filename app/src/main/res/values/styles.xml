@@ -33,5 +33,11 @@
         <item name="android:drawableTint">@color/search_line_content</item>
     </style>
 
+    <style name="TextAppearance_TabWidget">
+        <item name="android:textSize">@dimen/tabSizeText</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textColor">@color/setting_header_text</item>
+    </style>
 
 </resources>

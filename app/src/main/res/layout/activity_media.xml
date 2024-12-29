@@ -1,10 +1,53 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/backgroundApp">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="61dp">
+
+        <ImageView
+            android:id="@+id/arrow_back"
+            android:layout_width="@dimen/size_arrow_back"
+            android:layout_height="@dimen/size_arrow_back"
+            android:layout_marginTop="@dimen/settingBar_marginTop"
+            android:foreground="?attr/selectableItemBackground"
+            android:padding="@dimen/main_padding"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/setting_header_text" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="@dimen/settingBar_marginTop"
+            android:fontFamily="@font/ys_display_medium"
+            android:gravity="start"
+            android:padding="@dimen/settingBar_marginTop"
+            android:text="@string/main_media"
+            android:textColor="@color/setting_header_text"
+            android:textFontWeight="500"
+            android:textSize="@dimen/mainText_size" />
+
+    </LinearLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabViewMedia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/backgroundApp"
+        app:tabIndicatorColor="@color/setting_header_text"
+        app:tabTextAppearance="@style/TextAppearance_TabWidget"
+        app:tabSelectedTextColor="@color/setting_header_text"
+        app:tabTextColor="@color/setting_header_text"/>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pagerViewMedia"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"/>
 
 </LinearLayout>
