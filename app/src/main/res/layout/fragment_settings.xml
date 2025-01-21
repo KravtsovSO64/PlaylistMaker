@@ -6,21 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/backgroundApp">
+    android:background="@color/backgroundApp"
+    tools:context="com.practicum.playlistmaker.setting.ui.SettingsFragment">
 
    <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="61dp">
-
-       <ImageView
-           android:id="@+id/arrow_back"
-           android:layout_width="@dimen/size_arrow_back"
-           android:layout_height="@dimen/size_arrow_back"
-           android:layout_marginTop="@dimen/settingBar_marginTop"
-           android:padding="@dimen/main_padding"
-           android:src="@drawable/ic_arrow_back"
-           android:foreground="?attr/selectableItemBackground"
-           app:tint="@color/setting_header_text"/>
 
        <TextView
            android:layout_width="match_parent"
@@ -29,7 +20,8 @@
            android:fontFamily="@font/ys_display_medium"
            android:textFontWeight="500"
            android:gravity="start"
-           android:padding="@dimen/settingBar_marginTop"
+           android:layout_marginLeft="18dp"
+           android:paddingTop="@dimen/settingBar_marginTop"
            android:text="@string/main_setting"
            android:textColor="@color/setting_header_text"
            android:textSize="@dimen/mainText_size" />

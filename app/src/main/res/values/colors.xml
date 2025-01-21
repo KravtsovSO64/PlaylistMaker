@@ -19,4 +19,6 @@
     <color name="background_button">#F56B6C</color>
     <color name="colorProgressBar">#3772E7</color>
     <color name="backgroundApp">#FFFFFF</color>
+    <color name="colorInactiveBottomNavigation">#1A1B22</color>
+    <color name="colorActiveBottomNavigation">#3772E7</color>
 </resources>

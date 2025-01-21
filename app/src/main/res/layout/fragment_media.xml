@@ -4,29 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/backgroundApp">
+    android:background="@color/backgroundApp"
+    tools:context="com.practicum.playlistmaker.media.ui.MediaFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="61dp">
 
-        <ImageView
-            android:id="@+id/arrow_back"
-            android:layout_width="@dimen/size_arrow_back"
-            android:layout_height="@dimen/size_arrow_back"
-            android:layout_marginTop="@dimen/settingBar_marginTop"
-            android:foreground="?attr/selectableItemBackground"
-            android:padding="@dimen/main_padding"
-            android:src="@drawable/ic_arrow_back"
-            app:tint="@color/setting_header_text" />
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="@dimen/settingBar_marginTop"
+            android:layout_marginLeft="18dp"
             android:fontFamily="@font/ys_display_medium"
             android:gravity="start"
-            android:padding="@dimen/settingBar_marginTop"
+            android:paddingTop="@dimen/settingBar_marginTop"
             android:text="@string/main_media"
             android:textColor="@color/setting_header_text"
             android:textFontWeight="500"

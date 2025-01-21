@@ -1,10 +1,15 @@
 package com.practicum.playlistmaker.player.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
@@ -26,8 +31,21 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(false)
+            ViewCompat.setOnApplyWindowInsetsListener(
+                findViewById(android.R.id.content)
+            ) { v: View, insets: WindowInsetsCompat ->
+                val statusBarHeight =
+                    insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+                v.setPadding(0, statusBarHeight, 0, 0)
+                insets
+            }
+        }
 
         track = getTrack()
         viewModel.setAudioUrl(track.previewUrl)

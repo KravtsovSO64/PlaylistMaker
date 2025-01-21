@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/colorActiveBottomNavigation" android:state_checked="true"/> <!-- Цвет для нажатой кнопки -->
+    <item android:color="@color/colorInactiveBottomNavigation"/> <!-- Цвет для неактивных кнопок -->
+</selector>

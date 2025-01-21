@@ -12,6 +12,6 @@ val viewModelModule = module {
     viewModel { TrackSearchViewModel(get(), get()) }
     viewModel { PlayerViewModel(get())}
     viewModel { ThemeViewModel(get()) }
-    viewModel {FavoriteTracksViewModel()}
-    viewModel {PlaylistViewModel()}
+    viewModel { FavoriteTracksViewModel() }
+    viewModel { PlaylistViewModel() }
 }
