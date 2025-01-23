@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+
 android {
     namespace = "com.practicum.playlistmaker"
     compileSdk = 34
@@ -58,6 +59,9 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
     implementation ("androidx.fragment:fragment-ktx:1.5.0")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("androidx.fragment:fragment-ktx:1.8.5")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
+    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
     testImplementation("junit:junit:4.13.2")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.14.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
