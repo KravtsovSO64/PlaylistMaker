@@ -15,6 +15,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.creator.Constants
+import com.practicum.playlistmaker.creator.gone
+import com.practicum.playlistmaker.creator.show
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.player.ui.PlayerActivity
 import com.practicum.playlistmaker.search.domain.models.Track
@@ -64,7 +66,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
 
         binding.clearIcon.setOnClickListener {
             clearSearchRequest()
-            it.visibility = View.GONE
+            it.gone()
         }
 
         binding.editText.addTextChangedListener(object : TextWatcher {
@@ -116,16 +118,16 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     private fun render(state: TrackSearchViewState) {
         when (state) {
             is TrackSearchViewState.Loading -> {
-                binding.trackList.visibility = View.GONE
+                binding.trackList.gone()
                 showProgressLoading(true)
             }
             is TrackSearchViewState.Error -> {
-                binding.trackList.visibility = View.GONE
+                binding.trackList.gone()
                 showProgressLoading(false)
                 showErrorMessage(2)
             }
             is TrackSearchViewState.Content -> {
-                binding.trackList.visibility = View.VISIBLE
+                binding.trackList.show()
                 showProgressLoading(false)
                 showUpdatedListTrack(state.tracks)
             }
@@ -155,7 +157,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
             } else {
                 adapterTrackHistory.historyListAdapter[position]
             }
-            serializableTrack(track)
+            transferTrackToPlayer(track)
             if (binding.trackList.adapter == adapterTrackSearch) {
                 viewModel.setToListHistorySearchMusic(track)
             }
@@ -185,54 +187,54 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     private fun showErrorMessage(status: Int) {
         when (status) {
             0 -> {
-                binding.buttonUpdateSearchMusic.visibility = View.GONE
-                binding.errorPoster.visibility = View.GONE
-                binding.errorMessage.visibility = View.GONE
-                binding.progressBar.visibility = View.GONE
-                binding.trackList.visibility = View.VISIBLE
+                binding.buttonUpdateSearchMusic.gone()
+                binding.errorPoster.gone()
+                binding.errorMessage.gone()
+                binding.progressBar.gone()
+                binding.trackList.show()
             }
             1 -> {
-                binding.trackList.visibility = View.GONE
-                binding.buttonUpdateSearchMusic.visibility = View.GONE
-                binding.progressBar.visibility = View.GONE
-                binding.errorPoster.visibility = View.VISIBLE
-                binding.errorMessage.visibility = View.VISIBLE
+                binding.trackList.gone()
+                binding.buttonUpdateSearchMusic.gone()
+                binding.progressBar.gone()
+                binding.errorPoster.show()
+                binding.errorMessage.show()
                 binding.errorMessage.text = resources.getText(R.string.noFoundСontent)
                 binding.errorPoster.setImageResource(R.drawable.ic_not_found)
             }
             2 -> {
-                binding.trackList.visibility = View.GONE
-                binding.progressBar.visibility = View.GONE
-                binding.errorPoster.visibility = View.VISIBLE
-                binding.errorMessage.visibility = View.VISIBLE
-                binding.buttonUpdateSearchMusic.visibility = View.VISIBLE
+                binding.trackList.gone()
+                binding.progressBar.gone()
+                binding.errorPoster.show()
+                binding.errorMessage.show()
+                binding.buttonUpdateSearchMusic.show()
                 binding.errorMessage.text = resources.getText(R.string.noInternetСontent)
                 binding.errorPoster.setImageResource(R.drawable.ic_no_internet_ligth)
             }
             else -> {
-                binding.buttonUpdateSearchMusic.visibility = View.GONE
-                binding.errorPoster.visibility = View.GONE
-                binding.errorMessage.visibility = View.GONE
-                binding.trackList.visibility = View.VISIBLE
+                binding.buttonUpdateSearchMusic.gone()
+                binding.errorPoster.gone()
+                binding.errorMessage.gone()
+                binding.trackList.show()
             }
         }
     }
 
     private fun showHistorySearchTrack(hasFocus: Boolean) {
         if (hasFocus && binding.editText.text.isEmpty() && adapterTrackHistory.historyListAdapter.isNotEmpty()) {
-            binding.hintTextSearch.visibility = View.VISIBLE
-            binding.buttonClearHistory.visibility = View.VISIBLE
+            binding.hintTextSearch.show()
+            binding.buttonClearHistory.show()
             binding.trackList.adapter = adapterTrackHistory
             adapterTrackHistory.notifyDataSetChanged()
         } else {
-            binding.hintTextSearch.visibility = View.GONE
-            binding.buttonClearHistory.visibility = View.GONE
+            binding.hintTextSearch.gone()
+            binding.buttonClearHistory.gone()
             binding.trackList.adapter = adapterTrackSearch
             adapterTrackSearch.notifyDataSetChanged()
         }
     }
 
-    private fun serializableTrack(track: Track) {
+    private fun transferTrackToPlayer(track: Track) {
         val playerIntent = Intent(requireContext(), PlayerActivity::class.java).apply {
             putExtra(Constants.TRACK, track)
         }

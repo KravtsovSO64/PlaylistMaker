@@ -13,7 +13,8 @@ class MediaFragment : Fragment(R.layout.fragment_media) {
 
     private var _binding: FragmentMediaBinding? = null
     private val binding get() = _binding!!
-    private lateinit var tabMediator: TabLayoutMediator
+
+    private var tabMediator: TabLayoutMediator? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,12 +35,13 @@ class MediaFragment : Fragment(R.layout.fragment_media) {
                 else -> tab.setText(R.string.PlaylistTab)
             }
         }
-        tabMediator.attach()
+
+        tabMediator?.attach()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        tabMediator.detach()
+        tabMediator?.detach()
         _binding = null
     }
 }
