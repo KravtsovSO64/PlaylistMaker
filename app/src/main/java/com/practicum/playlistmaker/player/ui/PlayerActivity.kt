@@ -13,11 +13,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.creator.Constants
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
 import com.practicum.playlistmaker.player.presentation.state.PlayerState
 import com.practicum.playlistmaker.player.presentation.view.PlayerViewModel
 import com.practicum.playlistmaker.search.domain.models.Track
+import com.practicum.playlistmaker.utils.Constants
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.ZonedDateTime
 
@@ -48,7 +48,9 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         track = getTrack()
-        viewModel.setAudioUrl(track.previewUrl)
+
+        viewModel.setAudioUrl(track.previewUrl.toString())
+
         mainThreadHandler = Handler(Looper.getMainLooper())
 
         viewModel.playerState.observe(this) { state ->
@@ -91,7 +93,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.countryTrackPlayer.text = track.country
 
         Glide.with(this)
-            .load(getCoverArtwork(track.artworkUrl100))
+            .load(getCoverArtwork(track.artworkUrl100.toString()))
             .placeholder(R.drawable.ic_place_holder)
             .centerCrop()
             .transform(RoundedCorners(8))

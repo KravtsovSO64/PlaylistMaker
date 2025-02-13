@@ -2,7 +2,7 @@ package com.practicum.playlistmaker.search.domain.usecases
 
 import com.practicum.playlistmaker.search.domain.api.MusicLocalIterator
 import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.search.domain.repository.MusicLocalRepository
+import com.practicum.playlistmaker.search.domain.api.MusicLocalRepository
 
 class MusicLocalIteratorImpl(private val repository: MusicLocalRepository) : MusicLocalIterator {
     override fun get() : List<Track> {

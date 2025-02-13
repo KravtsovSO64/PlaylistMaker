@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.search.domain.models.Track
 
-class TrackAdapter(private val listener: OnTrackClickListener) : RecyclerView.Adapter<TrackViewHolder>() {
+class TrackAdapter(val listener: OnTrackClickListener) : RecyclerView.Adapter<TrackViewHolder>() {
 
     var searchListAdapter = ArrayList<Track>()
 
