@@ -3,48 +3,66 @@ package com.practicum.playlistmaker.search.viewmodel.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.practicum.playlistmaker.search.data.dto.Result
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.search.domain.api.MusicLocalIterator
-import com.practicum.playlistmaker.search.domain.api.MusicNetworkInteractor
+import com.practicum.playlistmaker.search.domain.api.MusicNetworkIterator
 import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.search.viewmodel.state.TrackSearchViewState
+import com.practicum.playlistmaker.search.viewmodel.state.TrackState
+import kotlinx.coroutines.launch
 
 class TrackSearchViewModel(
-    private val interactorNetwork: MusicNetworkInteractor,
+    private val interactorNetwork: MusicNetworkIterator,
     private val iteratorLocal: MusicLocalIterator
 ) : ViewModel() {
 
-    private val _state = MutableLiveData<TrackSearchViewState>()
-    val state: LiveData<TrackSearchViewState> get() = _state
+    private val _state = MutableLiveData<TrackState>()
+    val state: LiveData<TrackState> get() = _state
 
-    fun searchMusic(term: String) {
-        _state.value = TrackSearchViewState.Loading
+    fun searchMusic(changedText: String) {
+        _state.value = TrackState.Loading
 
-        interactorNetwork.searchTrack(term, object : MusicNetworkInteractor.MusicConsumer {
-            override fun consumer(result: Result<List<Track>>) {
-                when (result) {
-                    is Result.Success -> {
-                        _state.postValue(TrackSearchViewState.Content(result.data, result.code))
-                    }
-                    is Result.Failure -> {
-                        _state.postValue(TrackSearchViewState.Error(result.code))
-                    }
-                }
+        viewModelScope.launch {
+            interactorNetwork.searchTrack(changedText).collect{ pair ->
+                processResult(pair.first, pair.second)
             }
-        })
+        }
     }
 
     fun getListHistorySearchMusic() {
-        _state.postValue(TrackSearchViewState.History(iteratorLocal.get()))
+        _state.postValue(TrackState.History(iteratorLocal.get()))
     }
 
     fun setToListHistorySearchMusic(track: Track) {
         iteratorLocal.set(track)
-        _state.postValue(TrackSearchViewState.History(iteratorLocal.get()))
+        _state.postValue(TrackState.History(iteratorLocal.get()))
     }
 
     fun removeListHistorySearchMusic() {
         iteratorLocal.remove()
-        _state.postValue(TrackSearchViewState.History(iteratorLocal.get()))
+        _state.postValue(TrackState.History(iteratorLocal.get()))
     }
+
+    private fun processResult(foundMusic: List<Track>?, errorMessage: String?){
+        val tracks = mutableListOf<Track>()
+        if (foundMusic != null){
+            tracks.addAll(foundMusic)
+        }
+        when {
+            errorMessage != null -> {
+                setStateToView(TrackState.Error(errorMessage))
+            }
+            tracks.isEmpty() -> {
+                setStateToView(TrackState.Empty)
+            }
+            else -> {
+                setStateToView(TrackState.Content(tracks))
+            }
+        }
+
+    }
+
+    private fun setStateToView(state: TrackState) {
+        _state.postValue(state)
+    }
+
 }

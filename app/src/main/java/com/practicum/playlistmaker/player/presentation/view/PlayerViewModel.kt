@@ -1,19 +1,23 @@
 package com.practicum.playlistmaker.player.presentation.view
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.api.MediaPlayerIterator
 import com.practicum.playlistmaker.player.domain.api.PlayerStatusListener
 import com.practicum.playlistmaker.player.presentation.state.PlayerState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerViewModel(private val iterator: MediaPlayerIterator) : ViewModel() {
     private val _playerState = MutableLiveData<PlayerState>().apply { value = PlayerState() }
     val playerState: LiveData<PlayerState> get() = _playerState
+
+    private var timingJob: Job? = null
 
     fun setAudioUrl(url: String) {
         val currentState = _playerState.value ?: PlayerState()
@@ -48,18 +52,19 @@ class PlayerViewModel(private val iterator: MediaPlayerIterator) : ViewModel() {
         }
     }
 
+    ///
     private fun startUpdatingCurrentPosition() {
-        val handler = Handler(Looper.getMainLooper())
-        handler.post(object : Runnable {
-            override fun run() {
+        timingJob = viewModelScope.launch {
+            while (iterator.isPlaying()){
+                delay(300L)
                 if (iterator.isPlaying()) {
                     val currentTime = SimpleDateFormat("mm:ss", Locale.getDefault()).format(iterator.currentPosition())
                     val currentState = _playerState.value ?: PlayerState()
                     _playerState.value = currentState.copy(currentPosition = currentTime)
                 }
-                handler.postDelayed(this, 300)
             }
-        })
+            timingJob?.cancel()
+        }
     }
 
     fun setupListeners() {

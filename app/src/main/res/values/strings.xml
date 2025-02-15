@@ -22,4 +22,6 @@
     <string name="mediaPlaylistHolder">Вы не создали\nни одного плейлиста </string>
     <string name="favoriteTrackTab">Избранные треки</string>
     <string name="PlaylistTab">Плейлисты</string>
+    <string name="checkInternetConnection">Проверьте подключение к интернету</string>
+    <string name="errorServer">Ошибка сервера</string>
 </resources>

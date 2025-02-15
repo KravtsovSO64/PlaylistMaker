@@ -4,7 +4,7 @@ import com.practicum.playlistmaker.search.data.repositories.local.LocalStorage
 import com.practicum.playlistmaker.search.data.repositories.mapper.MapperTrackDtoFromTrack
 import com.practicum.playlistmaker.search.data.repositories.mapper.MapperTrackFromTrackDto
 import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.search.domain.repository.MusicLocalRepository
+import com.practicum.playlistmaker.search.domain.api.MusicLocalRepository
 
 class MusicLocalRepositoryImpl(private val localStorage: LocalStorage): MusicLocalRepository {
 
