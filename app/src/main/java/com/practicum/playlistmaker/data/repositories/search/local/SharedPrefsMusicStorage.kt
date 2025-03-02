@@ -1,0 +1,79 @@
+package com.practicum.playlistmaker.data.repositories.search.local
+
+import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.practicum.playlistmaker.data.dto.search.TrackDto
+import java.util.LinkedList
+
+class SharedPrefsMusicStorage(private val sharedPreferences: SharedPreferences,
+                              private val gson: Gson): LocalStorage {
+
+    private var list = getListFromMemory(sharedPreferences)
+    private val maxSizeList: Int = 10
+
+    //Получить из локального хранилища список
+    override fun getHistoryMusic(): List<TrackDto> {
+         return getListFromMemory(sharedPreferences).toList().map { track ->
+            TrackDto(
+                trackName = track.trackName,
+                artistName = track.artistName,
+                trackTimeMillis = track.trackTimeMillis,
+                artworkUrl100 = track.artworkUrl100,
+                trackId = track.trackId,
+                collectionName = track.collectionName,
+                releaseDate = track.releaseDate,
+                primaryGenreName = track.primaryGenreName,
+                country = track.country,
+                previewUrl = track.previewUrl
+            )
+        }
+    }
+
+    //Добавить и сохранить новый список в локальном хранилище
+    override fun setMusicToHistory(track: TrackDto) {
+        val iterator = list.iterator()
+        while (iterator.hasNext()) {
+            val item = iterator.next()
+            if (item.trackId == track.trackId) {
+                iterator.remove()
+                break
+            }
+        }
+        if (list.size < maxSizeList){
+            list.addFirst(track)
+        } else {
+            list.removeLast()
+            list.addFirst(track)
+        }
+        setListToMemory(sharedPreferences)
+    }
+
+    //Очистить и сохранить новый список в локальном хранилище
+    override fun removeHistoryMusic() {
+        list.clear()
+        setListToMemory(sharedPreferences)
+    }
+
+    //Получение списка localStorage
+    private fun getListFromMemory(sharedPreferences: SharedPreferences): LinkedList<TrackDto> {
+        val json = sharedPreferences.getString(KEY_HISTORY_SEARCH, null)
+        return if (json != null) {
+            gson.fromJson(json, object : TypeToken<LinkedList<TrackDto>>() {}.type) ?: LinkedList<TrackDto>()
+        } else {
+            LinkedList<TrackDto>()
+        }
+    }
+
+    //Сохранить список localStorage
+    private fun setListToMemory(sharedPreferences: SharedPreferences) {
+        val json = gson.toJson(list)
+        sharedPreferences.edit()
+            .putString(KEY_HISTORY_SEARCH, json)
+            .apply()
+    }
+
+    companion object {
+        private const val KEY_HISTORY_SEARCH = "key_history_search"
+    }
+}

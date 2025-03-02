@@ -2,12 +2,16 @@ package com.practicum.playlistmaker.di
 
 import android.content.Context
 import android.media.MediaPlayer
+import androidx.room.Room
 import com.google.gson.Gson
-import com.practicum.playlistmaker.search.data.repositories.local.LocalStorage
-import com.practicum.playlistmaker.search.data.repositories.local.SharedPrefsMusicStorage
-import com.practicum.playlistmaker.search.data.repositories.network.MusicApiService
-import com.practicum.playlistmaker.search.data.repositories.network.NetworkClient
-import com.practicum.playlistmaker.search.data.repositories.network.RetrofitNetworkClient
+import com.practicum.playlistmaker.data.db.AppDatabase
+import com.practicum.playlistmaker.data.db.converter.TrackDbConverter
+import com.practicum.playlistmaker.data.repositories.search.converter.TrackConverter
+import com.practicum.playlistmaker.data.repositories.search.local.LocalStorage
+import com.practicum.playlistmaker.data.repositories.search.local.SharedPrefsMusicStorage
+import com.practicum.playlistmaker.data.repositories.search.network.MusicApiService
+import com.practicum.playlistmaker.data.repositories.search.network.NetworkClient
+import com.practicum.playlistmaker.data.repositories.search.network.RetrofitNetworkClient
 import com.practicum.playlistmaker.utils.Constants
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -15,6 +19,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 val dataModule = module {
+
+    factory { Gson() }
+    factory { TrackDbConverter() }
+    factory { TrackConverter() }
+
     single<MusicApiService> {
         Retrofit.Builder()
         .baseUrl("https://itunes.apple.com")
@@ -30,8 +39,11 @@ val dataModule = module {
             .getSharedPreferences(Constants.HISTORY_SEARCH, Context.MODE_PRIVATE)
     }
 
-    factory { Gson() }
-
     single<LocalStorage> { SharedPrefsMusicStorage(get(),get()) }
     single<NetworkClient> { RetrofitNetworkClient(get(), androidContext())  }
+
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "favourite_tracks.db")
+        .build()
+    }
 }

@@ -7,17 +7,17 @@
 
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.practicum.playlistmaker.search.ui.ui.SearchFragment"
+        android:name="com.practicum.playlistmaker.ui.search.ui.SearchFragment"
         android:label="SearchFragment"
         tools:layout="@layout/fragment_search"/>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.practicum.playlistmaker.setting.ui.SettingsFragment"
+        android:name="com.practicum.playlistmaker.ui.setting.SettingsFragment"
         android:label="SettingsFragment"
         tools:layout="@layout/fragment_media"/>
     <fragment
         android:id="@+id/mediaFragment"
-        android:name="com.practicum.playlistmaker.media.ui.MediaFragment"
+        android:name="com.practicum.playlistmaker.ui.media.MediaFragment"
         android:label="MediaFragment"
         tools:layout="@layout/fragment_settings"/>
 </navigation>
