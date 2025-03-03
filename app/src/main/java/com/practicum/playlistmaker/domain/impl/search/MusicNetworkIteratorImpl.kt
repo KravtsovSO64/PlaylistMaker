@@ -14,17 +14,17 @@ class MusicNetworkIteratorImpl(
     private val appDatabase: AppDatabase
 ) : MusicNetworkIterator {
 
-    override fun searchTrack(expression: String): Flow<Pair<List<Track>?, String?>> {
-        return repository.searchMusic(expression).map { result ->
-            when(result) {
-                is Resource.Success -> {
-                    val favouriteTrack = appDatabase.favouriteTrackDao().getIndicatorsFavouriteTracks()
-                    Pair(getListWithFavouriteTracks(favouriteTrack, result.data), null)
+        override fun searchTrack(expression: String): Flow<Pair<List<Track>?, String?>> {
+            return repository.searchMusic(expression).map { result ->
+                when(result) {
+                    is Resource.Success -> {
+                        val favouriteTrack = appDatabase.favouriteTrackDao().getIndicatorsFavouriteTracks()
+                        Pair(getListWithFavouriteTracks(favouriteTrack, result.data), null)
+                    }
+                    is Resource.Error -> Pair(null, result.errorMessage)
                 }
-                is Resource.Error -> Pair(null, result.errorMessage)
             }
         }
-    }
 
     private fun getListWithFavouriteTracks(trackFavoriteIds: List<Int>, trackList: List<Track>?): List<Track> {
         return trackList?.map { track ->

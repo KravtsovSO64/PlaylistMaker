@@ -1,21 +1,21 @@
 package com.practicum.playlistmaker.ui.media
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentFavoriteTracksBinding
 import com.practicum.playlistmaker.domain.model.Track
 import com.practicum.playlistmaker.presentation.media.state.FavouriteTrackViewState
 import com.practicum.playlistmaker.presentation.media.viewmodel.FavoriteTracksViewModel
 import com.practicum.playlistmaker.ui.media.uicomponents.FavouriteTracksAdapter
-import com.practicum.playlistmaker.ui.player.PlayerActivity
+import com.practicum.playlistmaker.ui.player.PlayerFragment
 import com.practicum.playlistmaker.ui.search.uicomponents.OnTrackClickListener
-import com.practicum.playlistmaker.utils.Constants
 import com.practicum.playlistmaker.utils.gone
 import com.practicum.playlistmaker.utils.show
 import kotlinx.coroutines.delay
@@ -80,8 +80,9 @@ class FragmentFavoriteTracks: Fragment(), OnTrackClickListener {
     }
 
     override fun onResume() {
-        super.onResume()
         favoriteTracksViewModel.getListFavourite()
+        isClickAllowed = true
+        super.onResume()
     }
 
     override fun onDestroy() {
@@ -89,9 +90,7 @@ class FragmentFavoriteTracks: Fragment(), OnTrackClickListener {
         _binding = null
     }
 
-    override fun onItemClick(position: Int) {
-        val track = adapterFavouriteTrack.getList()[position]
-
+    override fun onItemClick(track: Track) {
         if (clickDebounce()) {
             transferTrackToPlayer(track)
         }
@@ -110,10 +109,7 @@ class FragmentFavoriteTracks: Fragment(), OnTrackClickListener {
     }
 
     private fun transferTrackToPlayer(track: Track) {
-        val playerIntent = Intent(requireContext(), PlayerActivity::class.java).apply {
-            putExtra(Constants.TRACK, track)
-        }
-        startActivity(playerIntent)
+        findNavController().navigate(R.id.action_mediaFragment_to_playerFragment, PlayerFragment.createArgs(track))
     }
 
     private fun switchView(flag: Boolean) {

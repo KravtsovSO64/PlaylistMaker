@@ -15,7 +15,7 @@ class TrackSearchViewModel(
     private val iteratorLocal: MusicLocalIterator
 ) : ViewModel() {
 
-    //LiveData
+    //LiveData for State View
     private val _state = MutableLiveData<TrackState>()
     val state: LiveData<TrackState> get() = _state
 
@@ -49,6 +49,16 @@ class TrackSearchViewModel(
         }
 
     }
+
+   /* fun setListTrack(tracks: List<Track>) {
+        cacheTrackList= tracks
+    }
+
+    fun getListTrack(): List<Track> {
+        return cacheTrackList ?: emptyList()
+    }
+
+    */
 
     private fun processResult(foundMusic: List<Track>?, errorMessage: String?){
         val tracks = mutableListOf<Track>()

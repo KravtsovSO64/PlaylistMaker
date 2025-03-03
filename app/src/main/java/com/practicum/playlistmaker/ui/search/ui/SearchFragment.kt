@@ -1,7 +1,6 @@
 package com.practicum.playlistmaker.ui.search.ui
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,13 +10,14 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.domain.model.Track
 import com.practicum.playlistmaker.presentation.search.state.TrackState
 import com.practicum.playlistmaker.presentation.search.viewmodel.TrackSearchViewModel
-import com.practicum.playlistmaker.ui.player.PlayerActivity
+import com.practicum.playlistmaker.ui.player.PlayerFragment
 import com.practicum.playlistmaker.ui.search.uicomponents.HistoryTrackAdapter
 import com.practicum.playlistmaker.ui.search.uicomponents.OnTrackClickListener
 import com.practicum.playlistmaker.ui.search.uicomponents.TrackAdapter
@@ -34,12 +34,18 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     private var inputMethodManager: InputMethodManager? = null
     private var searchRequest: String = ""
     private var latestSearchText: String = ""
+
+    //Binding
     private lateinit var binding: FragmentSearchBinding
+
+    //ViewModel
     private val viewModel by viewModel<TrackSearchViewModel>()
 
+    //Adapter for RecyclerView
     private val adapterTrackSearch = TrackAdapter(listener = this)
     private val adapterTrackHistory = HistoryTrackAdapter(listener = this)
 
+    //Object for click debounce
     private var isClickAllowed = true
     private var searchJob: Job? = null
 
@@ -53,7 +59,26 @@ class SearchFragment : Fragment(), OnTrackClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        /*
+        setFragmentResultListener("requestKey") { requestKey, bundle ->
+            val updatedTrack = bundle.getParcelable<Track>("updatedTrack")
+            if (updatedTrack != null) {
+                 updateTrackList(viewModel.getListTrack(), track)
+            }
+        }
+
+         */
+
+
         setupUI()
+    }
+
+    override fun onResume() {
+        repeatLastRequest()
+        isClickAllowed = true
+        super.onResume()
     }
 
     private fun setupUI() {
@@ -90,7 +115,9 @@ class SearchFragment : Fragment(), OnTrackClickListener {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                searchDebounce(searchRequest)
+                if (s.toString() != "") {
+                    searchDebounce(searchRequest)
+                }
             }
         })
 
@@ -99,9 +126,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
         }
 
         binding.buttonUpdateSearchMusic.setOnClickListener {
-            showErrorMessage(0)
-            latestSearchText = ""
-            searchDebounce(searchRequest)
+            repeatLastRequest()
         }
 
         binding.buttonClearHistory.setOnClickListener {
@@ -113,6 +138,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     }
 
     private fun clearSearchRequest() {
+        searchJob?.cancel()
         binding.editText.setText("")
         inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager?.hideSoftInputFromWindow(binding.editText.windowToken, 0)
@@ -160,12 +186,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
         adapterTrackSearch.notifyDataSetChanged()
     }
 
-    override fun onItemClick(position: Int) {
-        val track = if (binding.trackList.adapter == adapterTrackSearch) {
-            adapterTrackSearch.searchListAdapter[position]
-        } else {
-            adapterTrackHistory.historyListAdapter[position]
-        }
+    override fun onItemClick(track: Track) {
        if (clickDebounce()) {
            transferTrackToPlayer(track)
        }
@@ -196,7 +217,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
                 binding.errorMessage.show()
                 binding.buttonUpdateSearchMusic.show()
                 binding.errorMessage.text = resources.getText(R.string.noInternetСontent)
-                binding.errorPoster.setImageResource(R.drawable.ic_no_internet_ligth)
+                binding.errorPoster.setImageResource(R.drawable.ic_no_internet)
             }
             else -> {
                 binding.buttonUpdateSearchMusic.gone()
@@ -222,10 +243,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     }
 
     private fun transferTrackToPlayer(track: Track) {
-        val playerIntent = Intent(requireContext(), PlayerActivity::class.java).apply {
-            putExtra(Constants.TRACK, track)
-        }
-        startActivity(playerIntent)
+        findNavController().navigate(R.id.action_searchFragment_to_playerFragment, PlayerFragment.createArgs(track))
         addTrackToHistory(track)
     }
 
@@ -249,9 +267,16 @@ class SearchFragment : Fragment(), OnTrackClickListener {
 
         searchJob = viewLifecycleOwner.lifecycleScope.launch {
             delay(SEARCH_DEBOUNCE_DELAY)
+            hideKeyboard()
             viewModel.searchMusic(changedText)
         }
 
+    }
+
+    private fun repeatLastRequest() {
+        showErrorMessage(0)
+        latestSearchText = ""
+        searchDebounce(searchRequest)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -263,6 +288,20 @@ class SearchFragment : Fragment(), OnTrackClickListener {
         viewModel.setToListHistorySearchMusic(track)
         adapterTrackHistory.notifyDataSetChanged()
     }
+
+    private fun hideKeyboard() {
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.editText.windowToken, 0)
+    }
+
+    /*private fun updateTrackList(newList: List<Track>, track: Track){
+        val index = newList.indexOfFirst  { it.trackId == track.trackId }
+        adapterTrackSearch.updateSearchList(newList.toMutableList().apply { this[index] = track })
+        adapterTrackSearch.notifyDataSetChanged()
+        showErrorMessage(0)
+    }
+
+     */
 
     companion object {
         private const val CLICK_DEBOUNCE_DELAY = 300L

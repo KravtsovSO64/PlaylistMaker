@@ -20,7 +20,7 @@ class HistoryTrackAdapter(private val listener : OnTrackClickListener): Recycler
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(historyListAdapter[position])
         holder.itemView.setOnClickListener {
-            listener.onItemClick(position)
+            listener.onItemClick(historyListAdapter[position])
         }
     }
 

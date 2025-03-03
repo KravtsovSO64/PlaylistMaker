@@ -2,61 +2,76 @@ package com.practicum.playlistmaker.ui.player
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
+import com.practicum.playlistmaker.databinding.FragmentPlayerBinding
 import com.practicum.playlistmaker.domain.model.Track
 import com.practicum.playlistmaker.presentation.player.state.PlayerState
 import com.practicum.playlistmaker.presentation.player.viewmodel.PlayerViewModel
-import com.practicum.playlistmaker.utils.Constants
+import com.practicum.playlistmaker.presentation.search.viewmodel.TrackViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.ZonedDateTime
 
-class PlayerActivity : AppCompatActivity() {
+class PlayerFragment : Fragment() {
 
-    //Binding
-    private lateinit var binding: ActivityPlayerBinding
+    companion object {
 
-    //Instances class
+        private const val ARGS_TRACK = "track"
+
+        fun createArgs(track: Track): Bundle =
+            bundleOf(ARGS_TRACK to track)
+    }
+
+    // Binding
+    private var _binding: FragmentPlayerBinding? = null
+    private val binding get() = _binding!!
+
+    // Instances class
     private lateinit var track: Track
     private lateinit var timer: TextView
 
-    //ViewModel
+    // ViewModels
     private val viewModel by viewModel<PlayerViewModel>()
+    private val sharedViewModel by viewModel<TrackViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivityPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        track = arguments?.getParcelable<Track>(ARGS_TRACK) ?: throw IllegalArgumentException("Track cannot be null")
+    }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
-            ViewCompat.setOnApplyWindowInsetsListener(
-                findViewById(android.R.id.content)
-            ) { v: View, insets: WindowInsetsCompat ->
-                val statusBarHeight =
-                    insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
-                v.setPadding(0, statusBarHeight, 0, 0)
-                insets
-            }
-        }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentPlayerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        track = getTrack()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupEdgeToEdge()
+        setupUI()
+
         viewModel.setData(track)
-
         viewModel.setAudioUrl(track.previewUrl.toString())
 
-        viewModel.playerState.observe(this) { state ->
+        viewModel.playerState.observe(viewLifecycleOwner) { state ->
             updateUI(state)
+        }
+
+        sharedViewModel.trackLiveData.observe(viewLifecycleOwner) { updatedTrack ->
+            this.track = updatedTrack
         }
 
         viewModel.setupListeners()
@@ -66,14 +81,23 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         binding.arrowBackPlayer.setNavigationOnClickListener {
-            finish()
+            returnToSearchFragment(track)
         }
 
         binding.buttonIsFavoritePlayer.setOnClickListener { onFavoriteClicked() }
+    }
 
-        setupUI()
-        ///TAG
-        Log.d("toa", "${viewModel.playerState.value?.isFavourite}")
+    private fun setupEdgeToEdge() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            requireActivity().window.setDecorFitsSystemWindows(false)
+            ViewCompat.setOnApplyWindowInsetsListener(
+                requireActivity().findViewById(android.R.id.content)
+            ) { v: View, insets: WindowInsetsCompat ->
+                val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+                v.setPadding(0, statusBarHeight, 0, 0)
+                insets
+            }
+        }
     }
 
     private fun updateUI(state: PlayerState) {
@@ -86,14 +110,11 @@ class PlayerActivity : AppCompatActivity() {
         )
     }
 
-    private fun getTrack(): Track {
-        return intent.getSerializableExtra(Constants.TRACK) as? Track
-            ?: throw IllegalArgumentException("Track data required")
-    }
-
     private fun onFavoriteClicked() {
-        viewModel.run {
-            if (!track.isFavorite) insertFavouriteTrack(track) else deleteTrackFromFavourite(track)
+        if (!track.isFavorite) {
+            viewModel.insertFavouriteTrack(track)
+        } else {
+            viewModel.deleteTrackFromFavourite(track)
         }
     }
 
@@ -105,7 +126,9 @@ class PlayerActivity : AppCompatActivity() {
         binding.releaseYearTrackPlayer.text = track.releaseDate?.let { getYearFromDate(it).toString() }
         binding.styleTrackPlayer.text = track.primaryGenreName
         binding.countryTrackPlayer.text = track.country
-        binding.buttonIsFavoritePlayer.setImageResource( if (track.isFavorite) R.drawable.ic_button_is_favourite_track else R.drawable.ic_button_is_not_favourite_track)
+        binding.buttonIsFavoritePlayer.setImageResource(
+            if (track.isFavorite) R.drawable.ic_button_is_favourite_track else R.drawable.ic_button_is_not_favourite_track
+        )
 
         Glide.with(this)
             .load(getCoverArtwork(track.artworkUrl100.toString()))
@@ -120,11 +143,14 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (viewModel.playerState.value?.isPlaying == true) { viewModel.togglePlayback() }
+        if (viewModel.playerState.value?.isPlaying == true) {
+            viewModel.togglePlayback()
+        }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
         viewModel.stop()
     }
 
@@ -136,12 +162,21 @@ class PlayerActivity : AppCompatActivity() {
         return ZonedDateTime.parse(dateString).year
     }
 
-    private fun getCoverArtwork(artworkUrl100: String) = artworkUrl100.replaceAfterLast("/", "512x512bb.jpg")
+    private fun getCoverArtwork(artworkUrl100: String) =
+        artworkUrl100.replaceAfterLast("/", "512x512bb.jpg")
 
     private fun formatDuration(millis: Int): String {
         val minutes = (millis / 1000) / 60
         val seconds = (millis / 1000) % 60
         return String.format("%02d:%02d", minutes, seconds)
     }
-}
 
+    private fun returnToSearchFragment(updatedTrack: Track) {
+
+        val result = bundleOf("updatedTrack" to updatedTrack)
+
+        setFragmentResult("requestKey", result)
+
+        findNavController().popBackStack(R.id.playerFragment, true)
+    }
+}

@@ -25,7 +25,7 @@ class FavouriteTracksAdapter(private val listener : OnTrackClickListener): Recyc
     override fun onBindViewHolder(holder: FavouriteTracksViewHolder, position: Int) {
         holder.bind(favouriteListAdapter[position])
         holder.itemView.setOnClickListener {
-            listener.onItemClick(position)
+            listener.onItemClick(favouriteListAdapter[position])
         }
     }
 }
