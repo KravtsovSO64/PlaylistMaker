@@ -6,11 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -19,7 +19,8 @@ import com.practicum.playlistmaker.databinding.FragmentPlayerBinding
 import com.practicum.playlistmaker.domain.model.Track
 import com.practicum.playlistmaker.presentation.player.state.PlayerState
 import com.practicum.playlistmaker.presentation.player.viewmodel.PlayerViewModel
-import com.practicum.playlistmaker.presentation.search.viewmodel.TrackViewModel
+import com.practicum.playlistmaker.presentation.root.SharedViewModel
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.ZonedDateTime
 
@@ -43,11 +44,11 @@ class PlayerFragment : Fragment() {
 
     // ViewModels
     private val viewModel by viewModel<PlayerViewModel>()
-    private val sharedViewModel by viewModel<TrackViewModel>()
+    private val sharedViewModel: SharedViewModel by activityViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        track = arguments?.getParcelable<Track>(ARGS_TRACK) ?: throw IllegalArgumentException("Track cannot be null")
+        track = arguments?.getSerializable(ARGS_TRACK) as? Track ?: throw IllegalArgumentException("Track cannot be null")
     }
 
     override fun onCreateView(
@@ -70,10 +71,6 @@ class PlayerFragment : Fragment() {
             updateUI(state)
         }
 
-        sharedViewModel.trackLiveData.observe(viewLifecycleOwner) { updatedTrack ->
-            this.track = updatedTrack
-        }
-
         viewModel.setupListeners()
 
         binding.buttonPlayStopPlayer.setOnClickListener {
@@ -85,6 +82,12 @@ class PlayerFragment : Fragment() {
         }
 
         binding.buttonIsFavoritePlayer.setOnClickListener { onFavoriteClicked() }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                returnToSearchFragment(track)
+            }
+        })
     }
 
     private fun setupEdgeToEdge() {
@@ -172,11 +175,16 @@ class PlayerFragment : Fragment() {
     }
 
     private fun returnToSearchFragment(updatedTrack: Track) {
+        val tracks = sharedViewModel.items.value ?: return
+        val mutableTracks = tracks.toMutableList()
+        val index = mutableTracks.indexOfFirst { it.trackId == updatedTrack.trackId }
 
-        val result = bundleOf("updatedTrack" to updatedTrack)
+        if (index != -1) {
+            mutableTracks[index] = updatedTrack
+        }
 
-        setFragmentResult("requestKey", result)
+        sharedViewModel.setItems(mutableTracks)
 
-        findNavController().popBackStack(R.id.playerFragment, true)
+        findNavController().popBackStack()
     }
 }

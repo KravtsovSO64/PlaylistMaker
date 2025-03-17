@@ -17,6 +17,10 @@ class FavouriteTrackIteratorImpl(
         repository.deleteFavouriteTrack(track)
     }
 
+    override suspend fun getIndicatorsFavouriteTracks(): List<Int> {
+        return repository.getIndicatorsFavouriteTracks()
+    }
+
     override fun getListFavouriteTracks(): Flow<List<Track>> {
        return repository.getListFavouriteTracks()
     }

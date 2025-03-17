@@ -6,7 +6,7 @@ import com.practicum.playlistmaker.data.db.entities.FavouriteTrackEntity
 import com.practicum.playlistmaker.domain.api.media.FavouriteTrackRepository
 import com.practicum.playlistmaker.domain.model.Track
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 class FavouriteTrackRepositoryImpl(
     private val appDatabase: AppDatabase,
@@ -21,13 +21,22 @@ class FavouriteTrackRepositoryImpl(
         appDatabase.favouriteTrackDao().deleteTrack(converter.map(track))
     }
 
-    override fun getListFavouriteTracks(): Flow<List<Track>> = flow {
+    override suspend fun getIndicatorsFavouriteTracks(): List<Int> {
+        return  appDatabase.favouriteTrackDao().getIndicatorsFavouriteTracks()
+    }
+
+    override fun getListFavouriteTracks(): Flow<List<Track>> {
         val tracks = appDatabase.favouriteTrackDao().getListFavouriteTracks()
-        emit(convertFromTrackEntity(tracks))
+        return convertFromTrackEntity(tracks)
     }
 
-    private fun convertFromTrackEntity(tracks: List<FavouriteTrackEntity>): List<Track> {
-        return tracks.map { track -> converter.map(track) }
-    }
 
+
+    private fun convertFromTrackEntity(tracks: Flow<List<FavouriteTrackEntity>>): Flow<List<Track>> {
+        return tracks.map { list ->
+            list.map { track ->
+                converter.map(track)
+            }
+        }
+    }
 }

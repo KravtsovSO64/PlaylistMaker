@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.domain.api.media.FavouriteTrackIterator
 import com.practicum.playlistmaker.domain.api.search.MusicLocalIterator
 import com.practicum.playlistmaker.domain.api.search.MusicNetworkIterator
 import com.practicum.playlistmaker.domain.model.Track
@@ -12,12 +13,18 @@ import kotlinx.coroutines.launch
 
 class TrackSearchViewModel(
     private val interactorNetwork: MusicNetworkIterator,
-    private val iteratorLocal: MusicLocalIterator
+    private val iteratorLocal: MusicLocalIterator,
+    private val iteratorFavourite: FavouriteTrackIterator
 ) : ViewModel() {
 
     //LiveData for State View
     private val _state = MutableLiveData<TrackState>()
     val state: LiveData<TrackState> get() = _state
+
+    //LiveData for index tracks is favourite
+    private val _isFavorite = MutableLiveData<List<Int>>()
+    val isFavorite: LiveData<List<Int>> get() = _isFavorite
+
 
     fun searchMusic(changedText: String) {
         _state.value = TrackState.Loading
@@ -50,15 +57,11 @@ class TrackSearchViewModel(
 
     }
 
-   /* fun setListTrack(tracks: List<Track>) {
-        cacheTrackList= tracks
+    fun currentIndexesFavouriteTracks() {
+        viewModelScope.launch {
+            _isFavorite.postValue(iteratorFavourite.getIndicatorsFavouriteTracks())
+        }
     }
-
-    fun getListTrack(): List<Track> {
-        return cacheTrackList ?: emptyList()
-    }
-
-    */
 
     private fun processResult(foundMusic: List<Track>?, errorMessage: String?){
         val tracks = mutableListOf<Track>()

@@ -2,7 +2,6 @@ package com.practicum.playlistmaker.data.db.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.LocalTime
 
 @Entity(tableName = "favourite_track_table")
 data class FavouriteTrackEntity(
@@ -17,7 +16,7 @@ data class FavouriteTrackEntity(
     var primaryGenreName: String? = "Неизвестный жанр",
     var country: String? = "Неизвестная страна",
     var previewUrl: String? = "",
-    var timestamp: String = LocalTime.now().toString()
+    var timestamp: String = System.currentTimeMillis().toString()
 )
 
 

@@ -9,6 +9,8 @@ interface FavouriteTrackIterator {
 
     suspend fun deleteFavouriteTrack(track: Track)
 
+    suspend fun getIndicatorsFavouriteTracks(): List<Int>
+
     fun getListFavouriteTracks(): Flow<List<Track>>
     
 }

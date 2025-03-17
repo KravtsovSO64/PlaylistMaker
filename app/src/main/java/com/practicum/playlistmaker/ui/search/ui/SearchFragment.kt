@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +13,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.domain.model.Track
+import com.practicum.playlistmaker.presentation.root.SharedViewModel
 import com.practicum.playlistmaker.presentation.search.state.TrackState
 import com.practicum.playlistmaker.presentation.search.viewmodel.TrackSearchViewModel
 import com.practicum.playlistmaker.ui.player.PlayerFragment
@@ -27,6 +30,7 @@ import com.practicum.playlistmaker.utils.show
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment(), OnTrackClickListener {
@@ -34,12 +38,14 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     private var inputMethodManager: InputMethodManager? = null
     private var searchRequest: String = ""
     private var latestSearchText: String = ""
+    private lateinit var recyclerView: RecyclerView
 
     //Binding
     private lateinit var binding: FragmentSearchBinding
 
     //ViewModel
     private val viewModel by viewModel<TrackSearchViewModel>()
+    private val sharedViewModel: SharedViewModel by activityViewModel()
 
     //Adapter for RecyclerView
     private val adapterTrackSearch = TrackAdapter(listener = this)
@@ -60,41 +66,16 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        /*
-        setFragmentResultListener("requestKey") { requestKey, bundle ->
-            val updatedTrack = bundle.getParcelable<Track>("updatedTrack")
-            if (updatedTrack != null) {
-                 updateTrackList(viewModel.getListTrack(), track)
-            }
-        }
-
-         */
-
-
-        setupUI()
-    }
-
-    override fun onResume() {
-        repeatLastRequest()
-        isClickAllowed = true
-        super.onResume()
-    }
-
-    private fun setupUI() {
         viewModel.getListHistorySearchMusic()
 
-        binding.trackList.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        recyclerView = binding.trackList
+        recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             render(state)
             if (state is TrackState.History) adapterTrackHistory.updateSearchList(state.tracks)
         }
 
-        binding.clearIcon.setOnClickListener {
-            clearSearchRequest()
-            it.gone()
-        }
 
         binding.editText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -134,6 +115,22 @@ class SearchFragment : Fragment(), OnTrackClickListener {
             showHistorySearchTrack(false)
             adapterTrackHistory.historyListAdapter.clear()
             searchJob?.cancel()
+        }
+
+
+    }
+
+    override fun onResume() {
+        binding.trackList.show()
+        isClickAllowed = true
+        super.onResume()
+
+        sharedViewModel.items.observe(viewLifecycleOwner) {
+            if (it.isNotEmpty()) {
+                adapterTrackSearch.updateSearchList(it)
+                sharedViewModel.removeItems()
+                Log.d("Tag", "TYT" + adapterTrackSearch.searchListAdapter.toString())
+            }
         }
     }
 
@@ -188,7 +185,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
 
     override fun onItemClick(track: Track) {
        if (clickDebounce()) {
-           transferTrackToPlayer(track)
+           transferTrackToPlayer(isFavoriteTrack(track))
        }
     }
 
@@ -243,6 +240,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     }
 
     private fun transferTrackToPlayer(track: Track) {
+        sharedViewModel.setItems(adapterTrackSearch.searchListAdapter)
         findNavController().navigate(R.id.action_searchFragment_to_playerFragment, PlayerFragment.createArgs(track))
         addTrackToHistory(track)
     }
@@ -294,14 +292,20 @@ class SearchFragment : Fragment(), OnTrackClickListener {
         imm.hideSoftInputFromWindow(binding.editText.windowToken, 0)
     }
 
-    /*private fun updateTrackList(newList: List<Track>, track: Track){
-        val index = newList.indexOfFirst  { it.trackId == track.trackId }
-        adapterTrackSearch.updateSearchList(newList.toMutableList().apply { this[index] = track })
-        adapterTrackSearch.notifyDataSetChanged()
-        showErrorMessage(0)
-    }
+    private fun isFavoriteTrack(track: Track): Track {
+        viewModel.currentIndexesFavouriteTracks() //Сделали запрос на обновление списка в LiveData
+        val indexes = viewModel.isFavorite.value //Забираем значение из LiveData
 
-     */
+            return if (indexes != null && indexes.isEmpty()) {
+                if (track.trackId in indexes) {
+                    track.copy(isFavorite = true)
+                } else {
+                    track
+                }
+            } else {
+                track
+            }
+    }
 
     companion object {
         private const val CLICK_DEBOUNCE_DELAY = 300L
