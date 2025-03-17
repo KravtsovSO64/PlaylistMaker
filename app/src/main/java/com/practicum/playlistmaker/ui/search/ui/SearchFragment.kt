@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -76,6 +75,14 @@ class SearchFragment : Fragment(), OnTrackClickListener {
             if (state is TrackState.History) adapterTrackHistory.updateSearchList(state.tracks)
         }
 
+        sharedViewModel.items.observe(viewLifecycleOwner) {
+            adapterTrackSearch.updateSearchList(it)
+        }
+
+        binding.clearIcon.setOnClickListener {
+            clearSearchRequest()
+            it.gone()
+        }
 
         binding.editText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -117,21 +124,11 @@ class SearchFragment : Fragment(), OnTrackClickListener {
             searchJob?.cancel()
         }
 
-
     }
 
     override fun onResume() {
-        binding.trackList.show()
         isClickAllowed = true
         super.onResume()
-
-        sharedViewModel.items.observe(viewLifecycleOwner) {
-            if (it.isNotEmpty()) {
-                adapterTrackSearch.updateSearchList(it)
-                sharedViewModel.removeItems()
-                Log.d("Tag", "TYT" + adapterTrackSearch.searchListAdapter.toString())
-            }
-        }
     }
 
     private fun clearSearchRequest() {
