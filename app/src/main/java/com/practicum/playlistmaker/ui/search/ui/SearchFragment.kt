@@ -95,6 +95,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
                     viewModel.getListHistorySearchMusic()
                     showHistorySearchTrack(binding.editText.hasFocus())
                     sharedViewModel.removeItems()
+                    searchJob = null
                 } else {
                     showErrorMessage(0)
                     showHistorySearchTrack(false)
