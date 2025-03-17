@@ -80,6 +80,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
         }
 
         binding.clearIcon.setOnClickListener {
+            sharedViewModel.removeItems()
             clearSearchRequest()
             it.gone()
         }
@@ -93,6 +94,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
                     showErrorMessage(0)
                     viewModel.getListHistorySearchMusic()
                     showHistorySearchTrack(binding.editText.hasFocus())
+                    sharedViewModel.removeItems()
                 } else {
                     showErrorMessage(0)
                     showHistorySearchTrack(false)
