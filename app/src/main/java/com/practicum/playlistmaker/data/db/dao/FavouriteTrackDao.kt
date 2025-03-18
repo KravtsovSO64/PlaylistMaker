@@ -17,10 +17,10 @@ interface FavouriteTrackDao {
     @Delete(entity = FavouriteTrackEntity::class)
     suspend fun deleteTrack(track: FavouriteTrackEntity)
 
-    @Query("SELECT * FROM  favourite_track_table ORDER BY timestamp DESC")
-    fun getListFavouriteTracks(): Flow<List<FavouriteTrackEntity>>
-
     @Query("SELECT trackId FROM favourite_track_table" )
     suspend fun getIndicatorsFavouriteTracks(): List<Int>
+
+    @Query("SELECT * FROM  favourite_track_table ORDER BY timestamp DESC")
+    fun getListFavouriteTracks(): Flow<List<FavouriteTrackEntity>>
 
 }
