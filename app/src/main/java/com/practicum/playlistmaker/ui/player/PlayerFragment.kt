@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlayerBinding
 import com.practicum.playlistmaker.domain.model.Track
@@ -45,6 +46,8 @@ class PlayerFragment : Fragment() {
     // ViewModels
     private val viewModel by viewModel<PlayerViewModel>()
     private val sharedViewModel: SharedViewModel by activityViewModel()
+
+    private lateinit var bottomNavigationView: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +91,11 @@ class PlayerFragment : Fragment() {
                 returnToSearchFragment(track)
             }
         })
+
+        bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView)
+
+        bottomNavigationView.visibility =  View.GONE
+
     }
 
     private fun setupEdgeToEdge() {
@@ -175,6 +183,7 @@ class PlayerFragment : Fragment() {
     }
 
     private fun returnToSearchFragment(updatedTrack: Track) {
+
         val tracks = sharedViewModel.items.value ?: return
         val mutableTracks = tracks.toMutableList()
         val index = mutableTracks.indexOfFirst { it.trackId == updatedTrack.trackId }
@@ -184,6 +193,7 @@ class PlayerFragment : Fragment() {
         }
 
         sharedViewModel.setItems(mutableTracks)
+        bottomNavigationView.visibility =  View.VISIBLE
 
         findNavController().popBackStack()
     }
