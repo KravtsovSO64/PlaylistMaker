@@ -38,6 +38,7 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     private var searchRequest: String = ""
     private var latestSearchText: String = ""
     private lateinit var recyclerView: RecyclerView
+    private lateinit var searchList: List<Track> //new
 
     //Binding
     private lateinit var binding: FragmentSearchBinding
@@ -53,6 +54,13 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     //Object for click debounce
     private var isClickAllowed = true
     private var searchJob: Job? = null
+
+    //new
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        searchList = emptyList<Track>()
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -130,8 +138,19 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     }
 
     override fun onResume() {
+        adapterTrackSearch.updateSearchList(searchList) //new
         isClickAllowed = true
         super.onResume()
+    }
+
+    //new
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    //new
+    override fun onDestroyView() {
+        super.onDestroyView()
     }
 
     private fun clearSearchRequest() {
@@ -240,7 +259,8 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     }
 
     private fun transferTrackToPlayer(track: Track) {
-        sharedViewModel.setItems(adapterTrackSearch.searchListAdapter)
+        //sharedViewModel.setItems(adapterTrackSearch.searchListAdapter)
+        searchList = adapterTrackSearch.searchListAdapter //new
         findNavController().navigate(R.id.action_searchFragment_to_playerFragment, PlayerFragment.createArgs(track))
         addTrackToHistory(track)
     }

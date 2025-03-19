@@ -187,6 +187,8 @@ class PlayerFragment : Fragment() {
 
     private fun returnToSearchFragment(updatedTrack: Track) {
 
+        /*
+
         val tracks = sharedViewModel.items.value ?: return
         val mutableTracks = tracks.toMutableList()
         val index = mutableTracks.indexOfFirst { it.trackId == updatedTrack.trackId }
@@ -196,6 +198,9 @@ class PlayerFragment : Fragment() {
         }
 
         sharedViewModel.setItems(mutableTracks)
+
+         */
+
         bottomNavigationView.visibility =  View.VISIBLE
         divider.visibility = View.VISIBLE
 
