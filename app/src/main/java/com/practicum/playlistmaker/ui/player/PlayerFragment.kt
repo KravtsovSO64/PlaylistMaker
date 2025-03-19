@@ -48,6 +48,7 @@ class PlayerFragment : Fragment() {
     private val sharedViewModel: SharedViewModel by activityViewModel()
 
     private lateinit var bottomNavigationView: BottomNavigationView
+    private lateinit var divider: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,8 +94,10 @@ class PlayerFragment : Fragment() {
         })
 
         bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView)
+        divider =requireActivity().findViewById(R.id.divider)
 
         bottomNavigationView.visibility =  View.GONE
+        divider.visibility = View.GONE
 
     }
 
@@ -194,6 +197,7 @@ class PlayerFragment : Fragment() {
 
         sharedViewModel.setItems(mutableTracks)
         bottomNavigationView.visibility =  View.VISIBLE
+        divider.visibility = View.VISIBLE
 
         findNavController().popBackStack()
     }
