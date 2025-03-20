@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -83,9 +84,11 @@ class SearchFragment : Fragment(), OnTrackClickListener {
             if (state is TrackState.History) adapterTrackHistory.updateSearchList(state.tracks)
         }
 
-        sharedViewModel.items.observe(viewLifecycleOwner) {
+        /*sharedViewModel.items.observe(viewLifecycleOwner) {
             adapterTrackSearch.updateSearchList(it)
         }
+
+         */
 
         binding.clearIcon.setOnClickListener {
             sharedViewModel.removeItems()
@@ -135,10 +138,19 @@ class SearchFragment : Fragment(), OnTrackClickListener {
             searchJob?.cancel()
         }
 
+
+        //new
+        if (searchList.isNotEmpty()) {
+            adapterTrackSearch.updateSearchList(searchList)
+            recyclerView.adapter = adapterTrackSearch
+            adapterTrackSearch.notifyDataSetChanged()
+            showErrorMessage(0)
+            Log.d("T", binding.trackList.visibility.toString()) //new
+        }
+
     }
 
     override fun onResume() {
-        adapterTrackSearch.updateSearchList(searchList) //new
         isClickAllowed = true
         super.onResume()
     }
