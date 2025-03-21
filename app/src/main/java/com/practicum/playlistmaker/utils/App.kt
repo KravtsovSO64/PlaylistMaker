@@ -7,7 +7,7 @@ import com.practicum.playlistmaker.di.dataModule
 import com.practicum.playlistmaker.di.iteratorModule
 import com.practicum.playlistmaker.di.repositoryModule
 import com.practicum.playlistmaker.di.viewModelModule
-import com.practicum.playlistmaker.setting.domain.repository.ThemePreferenceRepository
+import com.practicum.playlistmaker.domain.api.setting.ThemePreferenceRepository
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
