@@ -6,24 +6,28 @@ import com.practicum.playlistmaker.domain.model.Track
 
 class TrackAdapter(val listener: OnTrackClickListener) : RecyclerView.Adapter<TrackViewHolder>() {
 
-    var searchListAdapter = ArrayList<Track>()
+    private var trackList = ArrayList<Track>()
 
-    fun updateSearchList(list: List<Track>){
-        if (!list.isNullOrEmpty()) {
-            searchListAdapter = ArrayList<Track>(list)
+    fun setList(list: List<Track>){
+        if (list.isNotEmpty()) {
+            trackList = ArrayList(list)
         }
+    }
+
+    fun getList(): List<Track>{
+        return trackList
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder = TrackViewHolder(parent)
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(searchListAdapter[position])
+        holder.bind(trackList[position])
         holder.itemView.setOnClickListener {
-            listener.onItemClick(searchListAdapter[position])
+            listener.onItemClick(trackList[position])
         }
     }
 
-    override fun getItemCount(): Int = searchListAdapter.size
+    override fun getItemCount(): Int = trackList.size
 }
 
 fun interface OnTrackClickListener {

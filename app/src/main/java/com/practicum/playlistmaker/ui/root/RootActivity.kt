@@ -11,13 +11,10 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityRootBinding
-import com.practicum.playlistmaker.presentation.root.SharedViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class RootActivity : AppCompatActivity() {
     private lateinit var binding : ActivityRootBinding
-    private val sharedViewModel: SharedViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()

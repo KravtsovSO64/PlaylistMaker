@@ -24,4 +24,6 @@
     <string name="PlaylistTab">Плейлисты</string>
     <string name="checkInternetConnection">Проверьте подключение к интернету</string>
     <string name="errorServer">Ошибка сервера</string>
+    <string name="addToPlaylist" translatable="false">Добавить в плейлист</string>
+    <string name="new_playlist" translatable="false">Новый плейлист</string>
 </resources>

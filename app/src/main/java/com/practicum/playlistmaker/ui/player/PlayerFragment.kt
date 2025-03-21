@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -20,15 +19,14 @@ import com.practicum.playlistmaker.databinding.FragmentPlayerBinding
 import com.practicum.playlistmaker.domain.model.Track
 import com.practicum.playlistmaker.presentation.player.state.PlayerState
 import com.practicum.playlistmaker.presentation.player.viewmodel.PlayerViewModel
-import com.practicum.playlistmaker.presentation.root.SharedViewModel
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import com.practicum.playlistmaker.utils.gone
+import com.practicum.playlistmaker.utils.show
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.ZonedDateTime
 
 class PlayerFragment : Fragment() {
 
     companion object {
-
         private const val ARGS_TRACK = "track"
 
         fun createArgs(track: Track): Bundle =
@@ -45,7 +43,6 @@ class PlayerFragment : Fragment() {
 
     // ViewModels
     private val viewModel by viewModel<PlayerViewModel>()
-    private val sharedViewModel: SharedViewModel by activityViewModel()
 
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var divider: View
@@ -71,6 +68,11 @@ class PlayerFragment : Fragment() {
         viewModel.setData(track)
         viewModel.setAudioUrl(track.previewUrl.toString())
 
+        bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView)
+        divider =requireActivity().findViewById(R.id.divider)
+
+        showBottomNavigation(false)
+
         viewModel.playerState.observe(viewLifecycleOwner) { state ->
             updateUI(state)
         }
@@ -82,23 +84,24 @@ class PlayerFragment : Fragment() {
         }
 
         binding.arrowBackPlayer.setNavigationOnClickListener {
-            returnToSearchFragment(track)
+            findNavController().popBackStack()
         }
 
         binding.buttonIsFavoritePlayer.setOnClickListener { onFavoriteClicked() }
+    }
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                returnToSearchFragment(track)
-            }
-        })
+    override fun onPause() {
+        super.onPause()
+        showBottomNavigation(true)
+        if (viewModel.playerState.value?.isPlaying == true) {
+            viewModel.togglePlayback()
+        }
+    }
 
-        bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView)
-        divider =requireActivity().findViewById(R.id.divider)
-
-        bottomNavigationView.visibility =  View.GONE
-        divider.visibility = View.GONE
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        viewModel.stop()
     }
 
     private fun setupEdgeToEdge() {
@@ -124,14 +127,6 @@ class PlayerFragment : Fragment() {
         )
     }
 
-    private fun onFavoriteClicked() {
-        if (!track.isFavorite) {
-            viewModel.insertFavouriteTrack(track)
-        } else {
-            viewModel.deleteTrackFromFavourite(track)
-        }
-    }
-
     private fun setupUI() {
         binding.trackNamePlayer.text = track.trackName
         binding.artistNamePlayer.text = track.artistName
@@ -155,17 +150,12 @@ class PlayerFragment : Fragment() {
         binding.buttonPlayStopPlayer.setImageResource(R.drawable.ic_button_play)
     }
 
-    override fun onPause() {
-        super.onPause()
-        if (viewModel.playerState.value?.isPlaying == true) {
-            viewModel.togglePlayback()
+    private fun onFavoriteClicked() {
+        if (!track.isFavorite) {
+            viewModel.insertFavouriteTrack(track)
+        } else {
+            viewModel.deleteTrackFromFavourite(track)
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        viewModel.stop()
     }
 
     private fun updateCurrentPosition(elapsedTime: String) {
@@ -185,25 +175,13 @@ class PlayerFragment : Fragment() {
         return String.format("%02d:%02d", minutes, seconds)
     }
 
-    private fun returnToSearchFragment(updatedTrack: Track) {
-
-        /*
-
-        val tracks = sharedViewModel.items.value ?: return
-        val mutableTracks = tracks.toMutableList()
-        val index = mutableTracks.indexOfFirst { it.trackId == updatedTrack.trackId }
-
-        if (index != -1) {
-            mutableTracks[index] = updatedTrack
+    private fun showBottomNavigation(flag: Boolean) {
+        if (flag) {
+            bottomNavigationView.show()
+            divider.show()
+        } else {
+            bottomNavigationView.gone()
+            divider.gone()
         }
-
-        sharedViewModel.setItems(mutableTracks)
-
-         */
-
-        bottomNavigationView.visibility =  View.VISIBLE
-        divider.visibility = View.VISIBLE
-
-        findNavController().popBackStack()
     }
 }

@@ -8,7 +8,7 @@ import com.practicum.playlistmaker.domain.api.media.FavouriteTrackIterator
 import com.practicum.playlistmaker.domain.api.search.MusicLocalIterator
 import com.practicum.playlistmaker.domain.api.search.MusicNetworkIterator
 import com.practicum.playlistmaker.domain.model.Track
-import com.practicum.playlistmaker.presentation.search.state.TrackState
+import com.practicum.playlistmaker.presentation.search.state.State
 import kotlinx.coroutines.launch
 
 class TrackSearchViewModel(
@@ -18,8 +18,8 @@ class TrackSearchViewModel(
 ) : ViewModel() {
 
     //LiveData for State View
-    private val _state = MutableLiveData<TrackState>()
-    val state: LiveData<TrackState> get() = _state
+    private val _state = MutableLiveData<State>()
+    val state: LiveData<State> get() = _state
 
     //LiveData for index tracks is favourite
     private val _isFavorite = MutableLiveData<List<Int>>()
@@ -27,7 +27,7 @@ class TrackSearchViewModel(
 
 
     fun searchMusic(changedText: String) {
-        _state.value = TrackState.Loading
+        _state.value = State.Loading
 
         viewModelScope.launch {
             interactorNetwork.searchTrack(changedText).collect{ pair ->
@@ -38,21 +38,21 @@ class TrackSearchViewModel(
 
     fun getListHistorySearchMusic() {
         viewModelScope.launch {
-            _state.postValue(TrackState.History(iteratorLocal.get()))
+            _state.postValue(State.History(iteratorLocal.get()))
         }
     }
 
     fun setToListHistorySearchMusic(track: Track) {
         iteratorLocal.set(track)
         viewModelScope.launch {
-            _state.postValue(TrackState.History(iteratorLocal.get()))
+            _state.postValue(State.History(iteratorLocal.get()))
         }
     }
 
     fun removeListHistorySearchMusic() {
         iteratorLocal.remove()
         viewModelScope.launch {
-            _state.postValue(TrackState.History(iteratorLocal.get()))
+            _state.postValue(State.History(iteratorLocal.get()))
         }
 
     }
@@ -70,19 +70,19 @@ class TrackSearchViewModel(
         }
         when {
             errorMessage != null -> {
-                setStateToView(TrackState.Error(errorMessage))
+                setStateToView(State.Error(errorMessage))
             }
             tracks.isEmpty() -> {
-                setStateToView(TrackState.Empty)
+                setStateToView(State.Empty)
             }
             else -> {
-                setStateToView(TrackState.Content(tracks))
+                setStateToView(State.Content(tracks))
             }
         }
 
     }
 
-    private fun setStateToView(state: TrackState) {
+    private fun setStateToView(state: State) {
         _state.postValue(state)
     }
 
