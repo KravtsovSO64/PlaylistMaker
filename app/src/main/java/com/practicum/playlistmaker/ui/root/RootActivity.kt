@@ -14,6 +14,9 @@ import com.practicum.playlistmaker.databinding.ActivityRootBinding
 
 
 class RootActivity : AppCompatActivity() {
+
+    private val REQUEST_CODE_STORAGE_PERMISSION = 101
+
     private lateinit var binding : ActivityRootBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +30,11 @@ class RootActivity : AppCompatActivity() {
 
         binding.bottomNavigationView.setupWithNavController(navController)
 
+        edgeToEdge()
+    }
 
+
+    private fun edgeToEdge() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
             ViewCompat.setOnApplyWindowInsetsListener(
@@ -39,6 +46,6 @@ class RootActivity : AppCompatActivity() {
                 insets
             }
         }
-
     }
+
 }

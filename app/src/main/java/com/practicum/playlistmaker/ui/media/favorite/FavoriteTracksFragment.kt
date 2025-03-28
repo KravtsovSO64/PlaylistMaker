@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.media
+package com.practicum.playlistmaker.ui.media.favorite
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,7 +13,6 @@ import com.practicum.playlistmaker.databinding.FragmentFavoriteTracksBinding
 import com.practicum.playlistmaker.domain.model.Track
 import com.practicum.playlistmaker.presentation.media.state.FavouriteTrackViewState
 import com.practicum.playlistmaker.presentation.media.viewmodel.FavoriteTracksViewModel
-import com.practicum.playlistmaker.ui.media.uicomponents.FavouriteTracksAdapter
 import com.practicum.playlistmaker.ui.player.PlayerFragment
 import com.practicum.playlistmaker.ui.search.uicomponents.OnTrackClickListener
 import com.practicum.playlistmaker.utils.gone
@@ -22,11 +21,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class FragmentFavoriteTracks: Fragment(), OnTrackClickListener {
+class FavoriteTracksFragment: Fragment(), OnTrackClickListener {
 
     companion object {
         private const val CLICK_DEBOUNCE_DELAY = 300L
-        fun newInstance(): FragmentFavoriteTracks = FragmentFavoriteTracks()
+        fun newInstance(): FavoriteTracksFragment = FavoriteTracksFragment()
     }
 
     //Binding

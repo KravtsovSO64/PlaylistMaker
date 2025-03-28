@@ -1,11 +1,13 @@
 package com.practicum.playlistmaker.di
 
-import com.practicum.playlistmaker.domain.api.media.FavouriteTrackIterator
+import com.practicum.playlistmaker.domain.api.media.playlist.PlaylistIterator
+import com.practicum.playlistmaker.domain.api.media.favorite.FavouriteTrackIterator
 import com.practicum.playlistmaker.domain.api.player.MediaPlayerIterator
 import com.practicum.playlistmaker.domain.api.search.MusicLocalIterator
 import com.practicum.playlistmaker.domain.api.search.MusicNetworkIterator
 import com.practicum.playlistmaker.domain.api.setting.ThemeSwitcherIteractor
-import com.practicum.playlistmaker.domain.impl.media.FavouriteTrackIteratorImpl
+import com.practicum.playlistmaker.domain.impl.media.favorite.FavouriteTrackIteratorImpl
+import com.practicum.playlistmaker.domain.impl.media.playlist.PlaylistIteratorImpl
 import com.practicum.playlistmaker.domain.impl.player.MediaPlayerIteratorImpl
 import com.practicum.playlistmaker.domain.impl.search.MusicLocalIteratorImpl
 import com.practicum.playlistmaker.domain.impl.search.MusicNetworkIteratorImpl
@@ -18,4 +20,5 @@ val iteratorModule = module {
     factory<MediaPlayerIterator> { MediaPlayerIteratorImpl(get()) }
     factory<ThemeSwitcherIteractor> { ThemeSwitcherIteractorImpl(get())  }
     factory<FavouriteTrackIterator> { FavouriteTrackIteratorImpl(get()) }
+    factory<PlaylistIterator> { PlaylistIteratorImpl(get()) }
 }

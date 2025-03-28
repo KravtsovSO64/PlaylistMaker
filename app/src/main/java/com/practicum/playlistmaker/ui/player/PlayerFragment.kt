@@ -33,17 +33,12 @@ class PlayerFragment : Fragment() {
             bundleOf(ARGS_TRACK to track)
     }
 
-    // Binding
-    private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
-
-    // Instances class
-    private lateinit var track: Track
-    private lateinit var timer: TextView
-
-    // ViewModels
     private val viewModel by viewModel<PlayerViewModel>()
 
+    private var _binding: FragmentPlayerBinding? = null
+    private lateinit var track: Track
+    private lateinit var timer: TextView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var divider: View
 
@@ -62,14 +57,13 @@ class PlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        clickHandler()
         setupEdgeToEdge()
         setupUI()
 
         viewModel.setData(track)
         viewModel.setAudioUrl(track.previewUrl.toString())
-
-        bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView)
-        divider =requireActivity().findViewById(R.id.divider)
 
         showBottomNavigation(false)
 
@@ -78,16 +72,6 @@ class PlayerFragment : Fragment() {
         }
 
         viewModel.setupListeners()
-
-        binding.buttonPlayStopPlayer.setOnClickListener {
-            viewModel.togglePlayback()
-        }
-
-        binding.arrowBackPlayer.setNavigationOnClickListener {
-            findNavController().popBackStack()
-        }
-
-        binding.buttonIsFavoritePlayer.setOnClickListener { onFavoriteClicked() }
     }
 
     override fun onPause() {
@@ -102,6 +86,23 @@ class PlayerFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         viewModel.stop()
+    }
+
+    private fun clickHandler() {
+        binding.apply {
+
+            buttonPlayStopPlayer.setOnClickListener {
+                viewModel.togglePlayback()
+            }
+
+            arrowBackPlayer.setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
+
+            buttonIsFavoritePlayer.setOnClickListener {
+                onFavoriteClicked()
+            }
+        }
     }
 
     private fun setupEdgeToEdge() {
@@ -128,16 +129,20 @@ class PlayerFragment : Fragment() {
     }
 
     private fun setupUI() {
-        binding.trackNamePlayer.text = track.trackName
-        binding.artistNamePlayer.text = track.artistName
-        binding.durationTrackPlayer.text = formatDuration(track.trackTimeMillis)
-        binding.albumTrackPlayer.text = track.collectionName
-        binding.releaseYearTrackPlayer.text = track.releaseDate?.let { getYearFromDate(it).toString() }
-        binding.styleTrackPlayer.text = track.primaryGenreName
-        binding.countryTrackPlayer.text = track.country
-        binding.buttonIsFavoritePlayer.setImageResource(
-            if (track.isFavorite) R.drawable.ic_button_is_favourite_track else R.drawable.ic_button_is_not_favourite_track
-        )
+
+        binding.apply {
+            trackNamePlayer.text = track.trackName
+            artistNamePlayer.text = track.artistName
+            durationTrackPlayer.text = formatDuration(track.trackTimeMillis)
+            albumTrackPlayer.text = track.collectionName
+            releaseYearTrackPlayer.text = track.releaseDate?.let { getYearFromDate(it).toString() }
+            styleTrackPlayer.text = track.primaryGenreName
+            countryTrackPlayer.text = track.country
+            buttonIsFavoritePlayer.setImageResource(
+                if (track.isFavorite) R.drawable.ic_button_is_favourite_track else R.drawable.ic_button_is_not_favourite_track
+            )
+            buttonPlayStopPlayer.setImageResource(R.drawable.ic_button_play)
+        }
 
         Glide.with(this)
             .load(getCoverArtwork(track.artworkUrl100.toString()))
@@ -147,7 +152,9 @@ class PlayerFragment : Fragment() {
             .into(binding.placeHolderPlayer)
 
         timer = binding.trackElapsedTimePlayer
-        binding.buttonPlayStopPlayer.setImageResource(R.drawable.ic_button_play)
+
+        bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView)
+        divider =requireActivity().findViewById(R.id.divider)
     }
 
     private fun onFavoriteClicked() {

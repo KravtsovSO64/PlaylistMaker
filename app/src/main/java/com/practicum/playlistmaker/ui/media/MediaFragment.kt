@@ -37,6 +37,7 @@ class MediaFragment : Fragment(R.layout.fragment_media) {
         }
 
         tabMediator?.attach()
+
     }
 
     override fun onDestroyView() {

@@ -27,10 +27,18 @@
         <action
             android:id="@+id/action_mediaFragment_to_playerFragment"
             app:destination="@id/playerFragment" />
+        <action
+            android:id="@+id/action_mediaFragment_to_fragmentCreatePlaylist"
+            app:destination="@id/fragmentCreatePlaylist" />
     </fragment>
     <fragment
         android:id="@+id/playerFragment"
         android:name="com.practicum.playlistmaker.ui.player.PlayerFragment"
         android:label="PlayerFragment"
         tools:layout="@layout/fragment_player" />
+    <fragment
+        android:id="@+id/fragmentCreatePlaylist"
+        android:name="com.practicum.playlistmaker.ui.media.playlist.CreatePlaylistFragment"
+        android:label="fragment_creating_playlist"
+        tools:layout="@layout/fragment_creating_playlist" />
 </navigation>

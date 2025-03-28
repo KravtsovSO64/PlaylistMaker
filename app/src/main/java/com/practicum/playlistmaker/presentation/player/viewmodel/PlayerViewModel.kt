@@ -4,7 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.practicum.playlistmaker.domain.api.media.FavouriteTrackIterator
+import com.practicum.playlistmaker.domain.api.media.favorite.FavouriteTrackIterator
+import com.practicum.playlistmaker.domain.api.media.playlist.PlaylistIterator
 import com.practicum.playlistmaker.domain.api.player.MediaPlayerIterator
 import com.practicum.playlistmaker.domain.api.player.PlayerStatusListener
 import com.practicum.playlistmaker.domain.model.Track
@@ -17,6 +18,7 @@ import java.util.Locale
 
 class PlayerViewModel(
     private val iterator: MediaPlayerIterator,
+    private val iteratorPlaylist: PlaylistIterator,
     private val iteratorFavouriteTrack: FavouriteTrackIterator
     ) : ViewModel() {
 

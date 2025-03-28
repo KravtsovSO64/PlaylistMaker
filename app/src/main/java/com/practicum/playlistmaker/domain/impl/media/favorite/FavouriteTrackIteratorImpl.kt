@@ -1,7 +1,7 @@
-package com.practicum.playlistmaker.domain.impl.media
+package com.practicum.playlistmaker.domain.impl.media.favorite
 
-import com.practicum.playlistmaker.domain.api.media.FavouriteTrackIterator
-import com.practicum.playlistmaker.domain.api.media.FavouriteTrackRepository
+import com.practicum.playlistmaker.domain.api.media.favorite.FavouriteTrackIterator
+import com.practicum.playlistmaker.domain.api.media.favorite.FavouriteTrackRepository
 import com.practicum.playlistmaker.domain.model.Track
 import kotlinx.coroutines.flow.Flow
 

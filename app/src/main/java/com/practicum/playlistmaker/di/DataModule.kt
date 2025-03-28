@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import androidx.room.Room
 import com.google.gson.Gson
 import com.practicum.playlistmaker.data.db.AppDatabase
+import com.practicum.playlistmaker.data.db.converter.PlaylistDbConverter
 import com.practicum.playlistmaker.data.db.converter.TrackDbConverter
 import com.practicum.playlistmaker.data.repositories.search.converter.TrackConverter
 import com.practicum.playlistmaker.data.repositories.search.local.LocalStorage
@@ -23,6 +24,7 @@ val dataModule = module {
     factory { Gson() }
     factory { TrackDbConverter() }
     factory { TrackConverter() }
+    factory { PlaylistDbConverter() }
 
     single<MusicApiService> {
         Retrofit.Builder()

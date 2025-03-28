@@ -15,7 +15,7 @@ import java.util.Locale
 class TrackViewHolder(parentView : ViewGroup) :
     RecyclerView.ViewHolder(
         LayoutInflater.from(parentView.context)
-            .inflate(R.layout.track_view, parentView, false)) {
+            .inflate(R.layout.track_item, parentView, false)) {
     private var trackName: TextView = itemView.findViewById(R.id.track_name)
     private var artistName: TextView = itemView.findViewById(R.id.artist_name)
     private var trackTime: TextView = itemView.findViewById(R.id.track_time)
