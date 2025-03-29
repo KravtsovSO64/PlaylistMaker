@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.domain.api.media.playlist
 
 import android.net.Uri
 import com.practicum.playlistmaker.domain.model.Playlist
+import com.practicum.playlistmaker.domain.model.Track
 import kotlinx.coroutines.flow.Flow
 
 interface PlaylistIterator {
@@ -14,5 +15,8 @@ interface PlaylistIterator {
 
     // Получение всех плейлистов
     fun getPlaylists(): Flow<List<Playlist>>
+
+    // Добавление трека в плейлист
+    suspend fun setTrack(playlist: Playlist,track: Track)
 
 }

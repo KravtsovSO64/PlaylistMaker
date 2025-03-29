@@ -6,28 +6,39 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlayerBinding
+import com.practicum.playlistmaker.domain.model.Playlist
 import com.practicum.playlistmaker.domain.model.Track
+import com.practicum.playlistmaker.presentation.media.state.AddTrackStatus
+import com.practicum.playlistmaker.presentation.media.state.PlaylistViewState
 import com.practicum.playlistmaker.presentation.player.state.PlayerState
 import com.practicum.playlistmaker.presentation.player.viewmodel.PlayerViewModel
 import com.practicum.playlistmaker.utils.gone
 import com.practicum.playlistmaker.utils.show
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.ZonedDateTime
 
-class PlayerFragment : Fragment() {
+class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
 
     companion object {
         private const val ARGS_TRACK = "track"
+        private const val CLICK_DEBOUNCE_DELAY = 300L
 
         fun createArgs(track: Track): Bundle =
             bundleOf(ARGS_TRACK to track)
@@ -36,19 +47,24 @@ class PlayerFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel by viewModel<PlayerViewModel>()
 
+
+    private var isClickAllowed = true
     private var _binding: FragmentPlayerBinding? = null
     private lateinit var track: Track
     private lateinit var timer: TextView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var divider: View
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        track = arguments?.getSerializable(ARGS_TRACK) as? Track ?: throw IllegalArgumentException("Track cannot be null")
+        track = arguments?.getSerializable(ARGS_TRACK) as? Track
+            ?: throw IllegalArgumentException("Track cannot be null")
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPlayerBinding.inflate(inflater, container, false)
@@ -61,11 +77,11 @@ class PlayerFragment : Fragment() {
         clickHandler()
         setupEdgeToEdge()
         setupUI()
+        showBottomNavigation(false)
+        bottomSheetManagement()
 
         viewModel.setData(track)
         viewModel.setAudioUrl(track.previewUrl.toString())
-
-        showBottomNavigation(false)
 
         viewModel.playerState.observe(viewLifecycleOwner) { state ->
             updateUI(state)
@@ -91,7 +107,7 @@ class PlayerFragment : Fragment() {
     private fun clickHandler() {
         binding.apply {
 
-            buttonPlayStopPlayer.setOnClickListener {
+            buttonPlayStop.setOnClickListener {
                 viewModel.togglePlayback()
             }
 
@@ -102,6 +118,7 @@ class PlayerFragment : Fragment() {
             buttonIsFavoritePlayer.setOnClickListener {
                 onFavoriteClicked()
             }
+
         }
     }
 
@@ -119,7 +136,7 @@ class PlayerFragment : Fragment() {
     }
 
     private fun updateUI(state: PlayerState) {
-        binding.buttonPlayStopPlayer.setImageResource(
+        binding.buttonPlayStop.setImageResource(
             if (state.isPlaying) R.drawable.ic_button_pause else R.drawable.ic_button_play
         )
         updateCurrentPosition(state.currentPosition)
@@ -141,7 +158,7 @@ class PlayerFragment : Fragment() {
             buttonIsFavoritePlayer.setImageResource(
                 if (track.isFavorite) R.drawable.ic_button_is_favourite_track else R.drawable.ic_button_is_not_favourite_track
             )
-            buttonPlayStopPlayer.setImageResource(R.drawable.ic_button_play)
+            buttonPlayStop.setImageResource(R.drawable.ic_button_play)
         }
 
         Glide.with(this)
@@ -154,12 +171,12 @@ class PlayerFragment : Fragment() {
         timer = binding.trackElapsedTimePlayer
 
         bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView)
-        divider =requireActivity().findViewById(R.id.divider)
+        divider = requireActivity().findViewById(R.id.divider)
     }
 
     private fun onFavoriteClicked() {
         if (!track.isFavorite) {
-            viewModel.insertFavouriteTrack(track)
+            viewModel.getFavouriteTrack(track)
         } else {
             viewModel.deleteTrackFromFavourite(track)
         }
@@ -190,5 +207,95 @@ class PlayerFragment : Fragment() {
             bottomNavigationView.gone()
             divider.gone()
         }
+    }
+
+    private fun bottomSheetManagement() {
+        val bottomSheetContainer = binding.bottomSheet
+        val overlay = binding.overlay
+
+        recyclerView = binding.includedHeader.playlists
+        recyclerView.layoutManager =  LinearLayoutManager(requireContext())
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        binding.apply {
+
+            buttonAddToPlaylist.setOnClickListener {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+            }
+
+            includedHeader.buttonCreatePlaylist.setOnClickListener {
+                findNavController().navigate(R.id.action_playerFragment_to_fragmentCreatePlaylist, null)
+            }
+        }
+
+        viewModel.playlistState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is PlaylistViewState.Empty -> {
+
+                }
+
+                is PlaylistViewState.Content -> {
+                    recyclerView.adapter = PlaylistAdapter(state.playlist, listener = this)
+                }
+            }
+        }
+
+        viewModel.addTrackStatus.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is AddTrackStatus.Success -> {
+                    Toast.makeText(requireContext(), " Добавлено в плейлист ${state.namePlaylist}", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                is AddTrackStatus.AlreadyExists -> {
+                    Toast.makeText(requireContext(), "Трек уже добавлен в плейлист ${state.namePlaylist}", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        overlay.visibility = View.GONE
+                    }
+
+                    else -> {
+                        viewModel.getPlaylists()
+                        overlay.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                overlay.alpha = (slideOffset + 1) / 2
+            }
+        })
+
+    }
+
+    override fun onItemClick(playlist: Playlist) {
+        if (clickDebounce()) {
+            viewModel.addTrackToPlaylist(playlist.id, track)
+        }
+    }
+
+    private fun clickDebounce(): Boolean {
+        val currentState = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
+        }
+        return currentState
     }
 }

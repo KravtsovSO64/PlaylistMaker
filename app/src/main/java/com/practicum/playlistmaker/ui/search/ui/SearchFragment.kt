@@ -28,9 +28,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment(), OnTrackClickListener {
-
-    private lateinit var binding: FragmentSearchBinding
-    private lateinit var trackAdapter: TrackAdapter
     private val viewModel by viewModel<TrackSearchViewModel>()
 
     private var searchRequest: String = ""
@@ -39,6 +36,8 @@ class SearchFragment : Fragment(), OnTrackClickListener {
     private var isClickAllowed = true
     private var lastSearchResults: List<Track> = emptyList()
     private lateinit var inputMethodManager: InputMethodManager
+    private lateinit var binding: FragmentSearchBinding
+    private lateinit var trackAdapter: TrackAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

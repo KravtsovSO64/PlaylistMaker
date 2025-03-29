@@ -18,7 +18,8 @@ class PlaylistViewModel(
     val stateView: LiveData<PlaylistViewState> get() = _stateView
 
     fun createPlaylist(name: String, description: String, coverImagePath: String) {
-        val playlist = Playlist(name = name , description = description, coverImagePath = coverImagePath)
+        val playlist =
+            Playlist(name = name, description = description, coverImagePath = coverImagePath)
         viewModelScope.launch {
             iterator.insert(playlist)
         }
@@ -43,7 +44,7 @@ class PlaylistViewModel(
     private fun processResult(playlist: List<Playlist>) {
         if (playlist.isEmpty()) {
             _stateView.postValue(PlaylistViewState.Empty(true))
-        } else{
+        } else {
             _stateView.postValue(PlaylistViewState.Content(playlist, false))
         }
     }
