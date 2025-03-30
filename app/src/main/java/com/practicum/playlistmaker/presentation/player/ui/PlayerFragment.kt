@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.player
+package com.practicum.playlistmaker.presentation.player.ui
 
 import android.os.Build
 import android.os.Bundle
@@ -47,13 +47,10 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     private val binding get() = _binding!!
     private val viewModel by viewModel<PlayerViewModel>()
 
-
     private var isClickAllowed = true
     private var _binding: FragmentPlayerBinding? = null
     private lateinit var track: Track
     private lateinit var timer: TextView
-    private lateinit var bottomNavigationView: BottomNavigationView
-    private lateinit var divider: View
     private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -170,8 +167,6 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
 
         timer = binding.trackElapsedTimePlayer
 
-        bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView)
-        divider = requireActivity().findViewById(R.id.divider)
     }
 
     private fun onFavoriteClicked() {
@@ -200,6 +195,9 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     }
 
     private fun showBottomNavigation(flag: Boolean) {
+        val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        val divider = requireActivity().findViewById<View>(R.id.divider)
+
         if (flag) {
             bottomNavigationView.show()
             divider.show()

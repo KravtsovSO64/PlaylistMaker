@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.media.playlist
+package com.practicum.playlistmaker.presentation.player.ui
 
 import android.view.View
 import android.widget.ImageView
@@ -21,9 +21,10 @@ class PlaylistViewHolder(view: View): RecyclerView.ViewHolder(view) {
             .load(playlist.coverImagePath)
             .apply(
                 RequestOptions()
-                    .placeholder(R.drawable.ic_place_holder) // Заглушка при загрузке
-                    .transform(RoundedCorners(8)) // Закругление углов (8dp)
+                    .placeholder(R.drawable.ic_place_holder)
+                    .transform(RoundedCorners(8))
             )
+            .centerCrop()
             .into(coverImage)
         name.text = playlist.name
         countTracks.text = getStringFrom(playlist.trackCount)

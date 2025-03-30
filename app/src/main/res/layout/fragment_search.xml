@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/backgroundApp"
-    tools:context="com.practicum.playlistmaker.ui.search.ui.SearchFragment">
+    tools:context="com.practicum.playlistmaker.presentation.search.ui.SearchFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

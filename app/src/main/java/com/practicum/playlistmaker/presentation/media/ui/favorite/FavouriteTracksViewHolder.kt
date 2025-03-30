@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.search.uicomponents
+package com.practicum.playlistmaker.presentation.media.ui.favorite
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -12,10 +12,9 @@ import com.practicum.playlistmaker.domain.model.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class TrackViewHolder(parentView : ViewGroup) :
-    RecyclerView.ViewHolder(
-        LayoutInflater.from(parentView.context)
-            .inflate(R.layout.track_item, parentView, false)) {
+class FavouriteTracksViewHolder(parentView: ViewGroup): RecyclerView.ViewHolder(LayoutInflater.from(parentView.context)
+    .inflate(R.layout.track_item, parentView, false)) {
+
     private var trackName: TextView = itemView.findViewById(R.id.track_name)
     private var artistName: TextView = itemView.findViewById(R.id.artist_name)
     private var trackTime: TextView = itemView.findViewById(R.id.track_time)
@@ -38,6 +37,3 @@ class TrackViewHolder(parentView : ViewGroup) :
         return formatTime.format(trackTimeMillis).toString()
     }
 }
-
-
-

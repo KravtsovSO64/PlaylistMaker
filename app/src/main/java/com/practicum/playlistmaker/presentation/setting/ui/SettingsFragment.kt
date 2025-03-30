@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.setting
+package com.practicum.playlistmaker.presentation.setting.ui
 
 import android.content.Intent
 import android.net.Uri

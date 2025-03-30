@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.search.ui
+package com.practicum.playlistmaker.presentation.search.ui
 
 import android.content.Context
 import android.os.Bundle
@@ -17,9 +17,7 @@ import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.domain.model.Track
 import com.practicum.playlistmaker.presentation.search.state.State
 import com.practicum.playlistmaker.presentation.search.viewmodel.TrackSearchViewModel
-import com.practicum.playlistmaker.ui.player.PlayerFragment
-import com.practicum.playlistmaker.ui.search.uicomponents.OnTrackClickListener
-import com.practicum.playlistmaker.ui.search.uicomponents.TrackAdapter
+import com.practicum.playlistmaker.presentation.player.ui.PlayerFragment
 import com.practicum.playlistmaker.utils.gone
 import com.practicum.playlistmaker.utils.show
 import kotlinx.coroutines.Job

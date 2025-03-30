@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.media.playlist
+package com.practicum.playlistmaker.presentation.media.ui.playlist
 
 import android.os.Bundle
 import android.text.Editable
@@ -10,12 +10,17 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentCreatingPlaylistBinding
 import com.practicum.playlistmaker.presentation.media.viewmodel.PlaylistViewModel
+import com.practicum.playlistmaker.utils.gone
+import com.practicum.playlistmaker.utils.show
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CreatePlaylistFragment: Fragment() {
@@ -58,6 +63,16 @@ class CreatePlaylistFragment: Fragment() {
         coverImagePath = ""
     }
 
+    override fun onResume() {
+        super.onResume()
+        showBottomNavigation(false)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        showBottomNavigation(true)
+    }
+
     private fun editName() {
         binding.editName.apply {
             addTextChangedListener(object: TextWatcher {
@@ -80,6 +95,11 @@ class CreatePlaylistFragment: Fragment() {
 
     private fun editDescription() {
         binding.editDescription.apply {
+
+            val editText = this
+            val cursorDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.text_cursor)
+            editText.textCursorDrawable = cursorDrawable
+
             addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
@@ -107,7 +127,7 @@ class CreatePlaylistFragment: Fragment() {
         }
     }
 
-    private fun switchActiveButtonCreate(text: String) =  text.isNotEmpty().also {
+    private fun switchActiveButtonCreate(text: String) =  text.isNotBlank().also {
         binding.buttonCreate.isEnabled = it
     }
 
@@ -148,6 +168,19 @@ class CreatePlaylistFragment: Fragment() {
 
     private fun navigateBack() {
         if (namePlaylist.isNotEmpty() || binding.addPhoto.drawable  != null)  confirmDialog?.show() else  findNavController().popBackStack()
+    }
+
+    private fun showBottomNavigation(flag: Boolean) {
+        val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        val divider = requireActivity().findViewById<View>(R.id.divider)
+
+        if (flag) {
+            bottomNavigationView.show()
+            divider.show()
+        } else {
+            bottomNavigationView.gone()
+            divider.gone()
+        }
     }
 
 }

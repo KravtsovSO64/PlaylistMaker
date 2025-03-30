@@ -1,11 +1,11 @@
-package com.practicum.playlistmaker.ui.media
+package com.practicum.playlistmaker.presentation.media.ui
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.practicum.playlistmaker.ui.media.favorite.FavoriteTracksFragment
-import com.practicum.playlistmaker.ui.media.playlist.PlaylistFragment
+import com.practicum.playlistmaker.presentation.media.ui.favorite.FavoriteTracksFragment
+import com.practicum.playlistmaker.presentation.media.ui.playlist.PlaylistFragment
 
 class MediaViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle)
     : FragmentStateAdapter(fragmentManager, lifecycle) {

@@ -1,9 +1,9 @@
-package com.practicum.playlistmaker.ui.media.favorite
+package com.practicum.playlistmaker.presentation.media.ui.favorite
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.domain.model.Track
-import com.practicum.playlistmaker.ui.search.uicomponents.OnTrackClickListener
+import com.practicum.playlistmaker.presentation.search.ui.OnTrackClickListener
 
 class FavouriteTracksAdapter(private val listener : OnTrackClickListener): RecyclerView.Adapter<FavouriteTracksViewHolder>() {
 

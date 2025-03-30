@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/backgroundApp"
-    tools:context=".ui.root.RootActivity">
+    tools:context=".presentation.root.RootActivity">
 
 <ScrollView
     android:layout_width="match_parent"

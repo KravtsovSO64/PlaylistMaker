@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.media.favorite
+package com.practicum.playlistmaker.presentation.media.ui.favorite
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,8 +13,8 @@ import com.practicum.playlistmaker.databinding.FragmentFavoriteTracksBinding
 import com.practicum.playlistmaker.domain.model.Track
 import com.practicum.playlistmaker.presentation.media.state.FavouriteTrackViewState
 import com.practicum.playlistmaker.presentation.media.viewmodel.FavoriteTracksViewModel
-import com.practicum.playlistmaker.ui.player.PlayerFragment
-import com.practicum.playlistmaker.ui.search.uicomponents.OnTrackClickListener
+import com.practicum.playlistmaker.presentation.player.ui.PlayerFragment
+import com.practicum.playlistmaker.presentation.search.ui.OnTrackClickListener
 import com.practicum.playlistmaker.utils.gone
 import com.practicum.playlistmaker.utils.show
 import kotlinx.coroutines.delay
