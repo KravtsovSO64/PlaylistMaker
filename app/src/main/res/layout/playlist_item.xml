@@ -8,7 +8,8 @@
     android:orientation="vertical"
     android:layout_marginTop="16dp"
     android:layout_marginStart="8dp"
-    android:layout_marginEnd="8dp">
+    android:layout_marginEnd="8dp"
+    android:background="@color/backgroundApp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/playlist_cover_card"
@@ -26,6 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
+            android:background="@color/backgroundApp"
             android:src="@drawable/ic_place_holder" />
 
     </androidx.cardview.widget.CardView>
