@@ -26,4 +26,14 @@ class PlaylistIteratorImpl(
     override suspend fun setTrack(playlist: Playlist,track: Track) {
         repository.setTrack(playlist, track)
     }
+
+    override fun getAllTracks(trackIdsJson: String): Flow<List<Track>> {
+        return repository.getAllTracks(trackIdsJson)
+    }
+
+    override suspend fun removeTrackFromPlaylist(playlist: Playlist, trackId: Int) {
+       repository.removeTrackFromPlaylist(playlist, trackId)
+    }
+
+
 }

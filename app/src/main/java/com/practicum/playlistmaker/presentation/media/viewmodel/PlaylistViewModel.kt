@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.api.media.playlist.PlaylistIterator
 import com.practicum.playlistmaker.domain.model.Playlist
+import com.practicum.playlistmaker.domain.model.Track
 import com.practicum.playlistmaker.presentation.media.state.PlaylistViewState
 import kotlinx.coroutines.launch
 
@@ -16,6 +17,10 @@ class PlaylistViewModel(
 
     private var _stateView = MutableLiveData<PlaylistViewState>()
     val stateView: LiveData<PlaylistViewState> get() = _stateView
+
+    private var _tracks = MutableLiveData<List<Track>>()
+    val track: LiveData<List<Track>> get() = _tracks
+
 
     fun createPlaylist(name: String, description: String, coverImagePath: String) {
         val playlist =
@@ -38,6 +43,22 @@ class PlaylistViewModel(
     fun saveImageToPrivateStorage(uri: Uri) {
         viewModelScope.launch {
             iterator.saveImageToPrivateStorage(uri)
+        }
+    }
+
+    fun getAllTracks(trackIdsJson: String) {
+        viewModelScope.launch {
+            iterator
+                .getAllTracks(trackIdsJson)
+                .collect { track ->
+                    _tracks.postValue(track)
+                }
+        }
+    }
+
+    fun removeTrackFromPlaylist(playlist: Playlist, trackId: Int) {
+        viewModelScope.launch {
+            iterator.removeTrackFromPlaylist(playlist, trackId)
         }
     }
 

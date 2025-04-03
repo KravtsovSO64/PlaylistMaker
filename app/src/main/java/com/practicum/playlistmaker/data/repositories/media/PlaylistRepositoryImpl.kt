@@ -35,6 +35,33 @@ class PlaylistRepositoryImpl(
         return convertFromPlaylistEntity(playlist)
     }
 
+    override fun getAllTracks(trackIdsJson: String): Flow<List<Track>> {
+        val trackIds  = convertJsonToList(trackIdsJson)
+
+        return appDatabase.tracksFromPlaylist().getAllTracks()
+            .map { playlistTracks ->
+                playlistTracks
+                    .filter { track -> trackIds.contains(track.trackId) }
+                    .map { track -> converter.map(track) }
+            }
+    }
+
+    override suspend fun removeTrackFromPlaylist(playlist: Playlist, trackId: Int): Playlist {
+        val currentTrackIds = convertJsonToList(playlist.trackIdsJson).toMutableList()
+
+        currentTrackIds.remove(trackId)
+
+        appDatabase.playlistDao().removeTrackFromPlaylist(
+            playlistId = playlist.id,
+            newTrackIdsJson = convertListToJson(currentTrackIds),
+            newCount = playlist.trackCount - 1)
+
+        // Проверяем и удаляем трек, если он больше не используется
+        checkAndRemoveUnusedTrack(trackId)
+
+        return converter.map(appDatabase.playlistDao().getPlaylistById(playlist.id)!!)
+    }
+
     override suspend fun setTrack(playlist: Playlist,track: Track) {
 
         //Добавление трека в отдельную таблицу playlist_track_table
@@ -65,7 +92,6 @@ class PlaylistRepositoryImpl(
             .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
     }
 
-
     private fun convertFromPlaylistEntity(playlistEntity: Flow<List<PlaylistEntity>>): Flow<List<Playlist>> {
         return playlistEntity.map { list ->
             list.map { playlist ->
@@ -93,6 +119,22 @@ class PlaylistRepositoryImpl(
 
     private fun convertListToJson(list: List<Int>): String {
         return Gson().toJson(list)
+    }
+
+    private suspend fun checkAndRemoveUnusedTrack(trackId: Int) {
+        // Получаем все плейлисты
+        val playlists = appDatabase.playlistDao().getAllPlaylistsSync()
+
+        // Проверяем, есть ли этот трек в каком-либо плейлисте
+        val isTrackUsed = playlists.any { playlist ->
+            val trackIds = convertJsonToList(playlist.trackIdsJson)
+            trackIds.contains(trackId)
+        }
+
+        // Если трек не используется ни в одном плейлисте, удаляем его
+        if (!isTrackUsed) {
+            appDatabase.tracksFromPlaylist().removeTrack(trackId)
+        }
     }
 
 

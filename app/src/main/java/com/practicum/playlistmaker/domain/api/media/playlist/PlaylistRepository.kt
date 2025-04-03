@@ -19,4 +19,10 @@ interface PlaylistRepository {
     // Добавление трека в плейлист
     suspend fun setTrack(playlist: Playlist,track: Track)
 
+    //Получение треков из плейлиста
+    fun getAllTracks(trackIdsJson: String): Flow<List<Track>>
+
+    //Удаление трека из плейлиста
+    suspend fun removeTrackFromPlaylist(playlist: Playlist, trackId: Int): Playlist
+
 }
