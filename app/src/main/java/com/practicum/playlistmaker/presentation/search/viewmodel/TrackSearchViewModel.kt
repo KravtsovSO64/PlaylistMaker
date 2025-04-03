@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.practicum.playlistmaker.domain.api.media.FavouriteTrackIterator
+import com.practicum.playlistmaker.domain.api.media.favorite.FavouriteTrackIterator
 import com.practicum.playlistmaker.domain.api.search.MusicLocalIterator
 import com.practicum.playlistmaker.domain.api.search.MusicNetworkIterator
 import com.practicum.playlistmaker.domain.model.Track
@@ -55,12 +55,6 @@ class TrackSearchViewModel(
             _state.postValue(State.History(iteratorLocal.get()))
         }
 
-    }
-
-    fun currentIndexesFavouriteTracks() {
-        viewModelScope.launch {
-            _isFavorite.postValue(iteratorFavourite.getIndicatorsFavouriteTracks())
-        }
     }
 
     private fun processResult(foundMusic: List<Track>?, errorMessage: String?){

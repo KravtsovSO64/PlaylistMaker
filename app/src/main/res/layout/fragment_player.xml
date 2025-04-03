@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundApp">
+    android:orientation="vertical"
+    android:background="@color/backgroundApp"
+    tools:context=".presentation.root.RootActivity">
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
@@ -45,6 +52,7 @@
         android:layout_height="0dp"
         android:layout_margin="8dp"
         android:scaleType="centerCrop"
+        android:background="@color/backgroundApp"
         android:src="@drawable/ic_place_holder"
         app:layout_constraintDimensionRatio="h,1:1"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
@@ -83,7 +91,7 @@
         app:layout_constraintTop_toBottomOf="@+id/trackNamePlayer"/>
 
   <ImageView
-      android:id="@+id/buttonAddToPlayListPlayer"
+      android:id="@+id/button_add_to_playlist"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginStart="8dp"
@@ -93,7 +101,7 @@
       app:layout_constraintTop_toBottomOf="@+id/artistNamePlayer"/>
 
     <ImageView
-        android:id="@+id/buttonPlayStopPlayer"
+        android:id="@+id/button_play_stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -123,7 +131,7 @@
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
         app:layout_constraintStart_toStartOf="@id/leftBorder"
-        app:layout_constraintTop_toBottomOf="@+id/buttonPlayStopPlayer" />
+        app:layout_constraintTop_toBottomOf="@+id/button_play_stop" />
 
     <TextView
         android:id="@+id/durationTrackCell"
@@ -254,3 +262,27 @@
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
+
+    <View android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="505dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <include layout="@layout/bottom_sheet_playlist"
+            android:id="@+id/includedHeader"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

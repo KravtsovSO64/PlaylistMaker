@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/backgroundApp"
-    tools:context="com.practicum.playlistmaker.ui.media.MediaFragment">
+    tools:context="com.practicum.playlistmaker.presentation.media.ui.MediaFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,6 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/backgroundApp"
+        android:overScrollMode="never"
         app:tabIndicatorColor="@color/setting_header_text"
         app:tabTextAppearance="@style/TextAppearance_TabWidget"
         app:tabSelectedTextColor="@color/setting_header_text"
