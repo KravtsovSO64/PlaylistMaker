@@ -56,6 +56,7 @@ class PlaylistsFragment: Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     override fun onResume() {
         super.onResume()
         isClickAllowed = true
+        viewModel.getPlaylists()
     }
 
     override fun onDestroyView() {
@@ -65,7 +66,6 @@ class PlaylistsFragment: Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     }
 
     private fun getStateView() {
-        viewModel.getPlaylists()
 
         viewModel.stateView.observe(viewLifecycleOwner) {
             render(it)
@@ -76,12 +76,13 @@ class PlaylistsFragment: Fragment(), PlaylistAdapter.OnPlaylistClickListener {
         when (state) {
             is PlaylistViewState.Empty -> {
                 showErrorMessage(state.enableErrorMessage)
+                adapter?.set(emptyList())
+                adapter?.notifyDataSetChanged()
             }
             is PlaylistViewState.Content -> {
                 showErrorMessage(state.enableErrorMessage)
-                adapter = PlaylistAdapter(state.playlist, this)
+                adapter?.set(state.playlist)
                 adapter?.notifyDataSetChanged()
-                recyclerView?.adapter = adapter
             }
         }
     }
@@ -97,6 +98,8 @@ class PlaylistsFragment: Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     private fun createRecyclerView() {
         recyclerView = binding.recyclerView
         recyclerView!!.layoutManager = GridLayoutManager(requireContext(), 2)
+        adapter = PlaylistAdapter(emptyList(), this)
+        recyclerView?.adapter = adapter
     }
 
     private fun showErrorMessage(enable: Boolean) {

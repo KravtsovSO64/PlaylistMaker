@@ -21,12 +21,21 @@ class PlaylistViewModel(
     private var _tracks = MutableLiveData<List<Track>>()
     val track: LiveData<List<Track>> get() = _tracks
 
+    private val _playlistLiveData = MutableLiveData<Playlist>()
+    val playlistLiveData: LiveData<Playlist> get() = _playlistLiveData
+
 
     fun createPlaylist(name: String, description: String, coverImagePath: String) {
         val playlist =
             Playlist(name = name, description = description, coverImagePath = coverImagePath)
         viewModelScope.launch {
             iterator.insert(playlist)
+        }
+    }
+
+    fun update(playlist: Playlist) {
+        viewModelScope.launch {
+            iterator.update(playlist)
         }
     }
 
@@ -56,9 +65,24 @@ class PlaylistViewModel(
         }
     }
 
+    fun getPlaylistById(playlistId: Long) {
+        viewModelScope.launch {
+           val playlist = iterator.getPlaylistById(playlistId)
+            _playlistLiveData.postValue(playlist)
+        }
+    }
+
     fun removeTrackFromPlaylist(playlist: Playlist, trackId: Int) {
         viewModelScope.launch {
-            iterator.removeTrackFromPlaylist(playlist, trackId)
+           val newPlaylist = iterator.removeTrackFromPlaylist(playlist, trackId)
+            _playlistLiveData.postValue(newPlaylist)
+            getAllTracks(newPlaylist.trackIdsJson)
+        }
+    }
+
+    fun deletePlaylist(playlist: Playlist) {
+        viewModelScope.launch {
+            iterator.deletePlaylist(playlist)
         }
     }
 

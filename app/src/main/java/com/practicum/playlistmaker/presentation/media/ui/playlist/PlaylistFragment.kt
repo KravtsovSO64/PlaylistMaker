@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.presentation.media.ui.playlist
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
@@ -26,12 +29,13 @@ import com.practicum.playlistmaker.utils.gone
 import com.practicum.playlistmaker.utils.show
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.internal.concurrent.formatDuration
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrackLongClickListener {
 
     companion object {
-        private const val ARGS_PLAYLIST = "playlist"
+        const val ARGS_PLAYLIST = "playlist"
         private const val CLICK_DEBOUNCE_DELAY = 300L
 
         fun createArgs(playlist: Playlist): Bundle =
@@ -44,7 +48,8 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
     private var adapter: TrackPLAdapter? = null
     private var isClickAllowed = true
     private var track: Track? = null
-    private var confirmDialog: MaterialAlertDialogBuilder? = null
+    private var removeTrackDialog: MaterialAlertDialogBuilder? = null
+    private var removePlaylistDialog: MaterialAlertDialogBuilder? = null
 
     private val binding: FragmentPlaylistBinding get() = _binding!!
     private val viewModel: PlaylistViewModel by viewModel()
@@ -71,6 +76,7 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
         getStateView()
         clickHandler()
         createDialogConfirmation()
+        bottomSheetManagement()
     }
 
     override fun onDestroyView() {
@@ -91,26 +97,15 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
 
     private fun getStateView() {
 
-        with(binding) {
+        viewModel.getPlaylistById(playlist.id)
+        viewModel.getAllTracks(playlist.trackIdsJson)
 
+        with(binding) {
             includedHeader.apply {
                 buttonCreatePlaylist.gone()
                 addTitle.gone()
             }
-
-            name.text = playlist.name
-            description.text = playlist.description
-            tracks.text = getStringFrom(playlist.trackCount)
-
-            Glide.with(this@PlaylistFragment)
-                .load(playlist.coverImagePath)
-                .placeholder(R.drawable.ic_place_holder)
-                .centerCrop()
-                .transform(RoundedCorners(2))
-                .into(poster)
         }
-
-        viewModel.getAllTracks(playlist.trackIdsJson)
 
         viewModel.track.observe(viewLifecycleOwner) { tracks ->
            val durationSum = tracks.sumOf { it.trackTimeMillis }
@@ -119,14 +114,28 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
             adapter?.notifyDataSetChanged()
             recyclerView?.adapter = adapter
         }
+
+        viewModel.playlistLiveData.observe(viewLifecycleOwner) { playlist ->
+            this.playlist = playlist
+            binding.name.text = playlist.name
+            binding.description.text = playlist.description
+            binding.tracks.text = getStringFrom(playlist.trackCount)
+
+            Glide.with(this@PlaylistFragment)
+                .load(playlist.coverImagePath)
+                .placeholder(R.drawable.ic_place_holder)
+                .centerCrop()
+                .transform(RoundedCorners(2))
+                .into(binding.poster)
+        }
     }
 
     private fun clickHandler() {
 
         with(binding) {
-           buttonShare.setOnClickListener {
-
-           }
+            buttonShare.setOnClickListener {
+                sharePlaylist()
+            }
 
             buttonMore.setOnClickListener {
 
@@ -201,20 +210,121 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
     }
 
     private fun createDialogConfirmation() {
-        confirmDialog = MaterialAlertDialogBuilder(requireContext())
+        removeTrackDialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle("Хотите удалить трек?")
             .setNegativeButton("Нет") { dialog, which ->
 
             }.setPositiveButton("Да") { dialog, which ->
                 Toast.makeText(requireContext(),"Трек удалён", Toast.LENGTH_SHORT).show()
                 viewModel.removeTrackFromPlaylist(playlist, track!!.trackId)
-                adapter?.notifyDataSetChanged()
             }
+
+        removePlaylistDialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Хотите удалить плейлист ${playlist.name}?")
+            .setNegativeButton("Нет") { dialog, which ->
+
+            }.setPositiveButton("Да") { dialog, which ->
+                Toast.makeText(requireContext(),"Плейлист удалён", Toast.LENGTH_SHORT).show()
+                viewModel.deletePlaylist(playlist)
+                findNavController().popBackStack()
+            }
+    }
+
+    private fun sharePlaylist() {
+        if (playlist.trackCount > 0) {
+            val shareMessage = buildString {
+                append("${playlist.name}\n")
+                append("${playlist.description}\n")
+                append("${playlist.trackCount} треков\n\n")
+
+                viewModel.track.value?.forEachIndexed { index, track ->
+                    append(
+                        "${index + 1}.${track.artistName} - ${track.trackName} (${
+                            formatDuration(
+                                track.trackTimeMillis.toLong()
+                            )
+                        })"
+                    )
+                }
+            }
+
+            activity?.let { context ->
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, shareMessage)
+                }
+                startActivity(Intent.createChooser(shareIntent, null))
+            }
+        }
+    }
+
+    private fun bottomSheetManagement() {
+        val bottomSheetContainer = binding.bottomSheetMenu
+        val overlay = binding.overlay
+        val includeMenu = binding.includedMenu
+
+        Glide.with(requireContext())
+            .load(playlist.coverImagePath)
+            .apply(
+                RequestOptions()
+                    .placeholder(R.drawable.ic_place_holder)
+                    .transform(RoundedCorners(2))
+            )
+            .centerCrop()
+            .transform(RoundedCorners(2))
+            .into(includeMenu.playlistCoverImage)
+
+        with(includeMenu) {
+            playlistName.text = playlist.name
+            playlistCount.text = getStringFrom(playlist.trackCount)
+        }
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        binding.buttonMore.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+
+        includeMenu.sharePlaylist.setOnClickListener {
+            sharePlaylist()
+        }
+
+        includeMenu.editPlaylist.setOnClickListener {
+            findNavController().navigate(R.id.action_playlistFragment_to_editPlaylistFragment, EditPlaylistFragment.createArgs(playlist))
+        }
+
+        includeMenu.removePlaylist.setOnClickListener {
+            removePlaylistDialog?.show()
+        }
+
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        overlay.visibility = View.GONE
+                    }
+
+                    else -> {
+                        overlay.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                overlay.alpha = (slideOffset + 1) / 2
+            }
+        })
+
     }
 
     override fun onItemLongClick(track: Track): Boolean {
         this.track = track
-        confirmDialog?.show()
+        removeTrackDialog?.show()
         return true
     }
 }

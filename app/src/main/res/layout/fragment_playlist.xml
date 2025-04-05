@@ -11,7 +11,8 @@
         android:id="@+id/arrowBackPlayer"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:navigationIcon="@drawable/ic_arrow_back" />
+        app:navigationIcon="@drawable/ic_arrow_back"
+        android:elevation= "4dp"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -44,40 +45,40 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <TextView  style="@style/Title"
             android:id="@+id/name"
-            style="@style/Title"
             android:layout_width="0dp"
             android:layout_height="28dp"
             android:layout_marginTop="24dp"
-            android:text="Машин Хед"
-            android:textFontWeight="700"
+            android:text="Альбом"
             android:textSize="24dp"
+            android:textFontWeight="700"
+            android:textColor="@color/main_button_color_text"
             app:layout_constraintEnd_toStartOf="@+id/right_border"
             app:layout_constraintStart_toStartOf="@+id/left_border"
             app:layout_constraintTop_toBottomOf="@+id/poster" />
 
-        <TextView
+        <TextView   style="@style/Title"
             android:id="@+id/description"
-            style="@style/Title"
             android:layout_width="0dp"
             android:layout_height="22dp"
             android:layout_marginTop="8dp"
-            android:text="2025"
+            android:text="Описание"
             android:textSize="18dp"
+            android:textColor="@color/main_button_color_text"
             app:layout_constraintEnd_toStartOf="@+id/right_border"
             app:layout_constraintStart_toStartOf="@+id/left_border"
             app:layout_constraintTop_toBottomOf="@+id/name" />
 
-        <TextView
+        <TextView style="@style/Title"
             android:id="@+id/time"
-            style="@style/Title"
             android:layout_width="wrap_content"
             android:layout_height="22dp"
             android:layout_marginTop="8dp"
             android:gravity="center_vertical"
             android:text="300 минут"
-            android:textSize="@dimen/searchText_size"
+            android:textSize="18dp"
+            android:textColor="@color/main_button_color_text"
             app:layout_constraintStart_toStartOf="@+id/left_border"
             app:layout_constraintTop_toBottomOf="@+id/description" />
 
@@ -93,16 +94,16 @@
             app:layout_constraintTop_toBottomOf="@+id/description"
             app:tint="@color/main_button_color_text" />
 
-        <TextView
+        <TextView  style="@style/Title"
             android:id="@+id/tracks"
-            style="@style/Title"
             android:layout_width="wrap_content"
             android:layout_height="22dp"
             android:layout_marginStart="6dp"
             android:layout_marginTop="8dp"
             android:gravity="center_vertical"
             android:text="55 треков"
-            android:textSize="@dimen/searchText_size"
+            android:textSize="18dp"
+            android:textColor="@color/main_button_color_text"
             app:layout_constraintStart_toStartOf="@+id/point"
             app:layout_constraintTop_toBottomOf="@+id/description" />
 
@@ -142,6 +143,28 @@
 
         <include layout="@layout/bottom_sheet_playlist"
             android:id="@+id/includedHeader"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+
+    </LinearLayout>
+
+    <View android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/bottom_sheet_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="382dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <include layout="@layout/bottom_sheet_menu"
+            android:id="@+id/included_menu"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
 
