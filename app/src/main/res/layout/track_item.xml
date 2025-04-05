@@ -51,7 +51,6 @@
                     android:fontFamily="@font/ys_display_regular"
                     android:textSize="@dimen/searchText_size"
                     android:textColor="@color/search_holder_artistName"
-                    android:maxWidth="56dp"
                     android:maxLines="1"
                     android:ellipsize="end"/>
                 <ImageView

@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -29,7 +30,6 @@ import com.practicum.playlistmaker.utils.gone
 import com.practicum.playlistmaker.utils.show
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okhttp3.internal.concurrent.formatDuration
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrackLongClickListener {
@@ -77,6 +77,7 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
         clickHandler()
         createDialogConfirmation()
         bottomSheetManagement()
+        isEmptyList()
     }
 
     override fun onDestroyView() {
@@ -120,12 +121,13 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
             binding.name.text = playlist.name
             binding.description.text = playlist.description
             binding.tracks.text = getStringFrom(playlist.trackCount)
+            isEmptyList()
+
 
             Glide.with(this@PlaylistFragment)
                 .load(playlist.coverImagePath)
                 .placeholder(R.drawable.ic_place_holder)
-                .centerCrop()
-                .transform(RoundedCorners(2))
+                .transform(CenterCrop(), RoundedCorners(2))
                 .into(binding.poster)
         }
     }
@@ -235,18 +237,16 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
             val shareMessage = buildString {
                 append("${playlist.name}\n")
                 append("${playlist.description}\n")
-                append("${playlist.trackCount} треков\n\n")
+                append("${getStringFrom(playlist.trackCount)}\n\n")
 
                 viewModel.track.value?.forEachIndexed { index, track ->
                     append(
-                        "${index + 1}.${track.artistName} - ${track.trackName} (${
-                            formatDuration(
-                                track.trackTimeMillis.toLong()
-                            )
-                        })"
+                        "${index + 1}. ${track.artistName} - ${track.trackName} (${
+                            getMinutesString((track.trackTimeMillis))
+                        })\n"
                     )
                 }
-            }
+            }.trim()
 
             activity?.let { context ->
                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -288,7 +288,12 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
         }
 
         includeMenu.sharePlaylist.setOnClickListener {
-            sharePlaylist()
+            if (playlist.trackCount == 0) {
+                Toast.makeText(requireContext(),"Нет треков, которыми можно поделиться.", Toast.LENGTH_SHORT).show()
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            } else {
+                sharePlaylist()
+            }
         }
 
         includeMenu.editPlaylist.setOnClickListener {
@@ -320,6 +325,12 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
             }
         })
 
+    }
+
+    private fun isEmptyList() {
+        if (playlist.trackCount == 0) {
+            Toast.makeText(requireContext(),"Плейлист пуст", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onItemLongClick(track: Track): Boolean {

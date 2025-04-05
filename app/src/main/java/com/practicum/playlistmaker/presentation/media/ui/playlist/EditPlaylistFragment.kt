@@ -16,10 +16,13 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentCreatingPlaylistBinding
 import com.practicum.playlistmaker.domain.model.Playlist
 import com.practicum.playlistmaker.presentation.media.viewmodel.PlaylistViewModel
+import com.practicum.playlistmaker.utils.gone
+import com.practicum.playlistmaker.utils.show
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class EditPlaylistFragment: Fragment() {
@@ -76,12 +79,24 @@ class EditPlaylistFragment: Fragment() {
         _binding = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        showBottomNavigation(false)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        showBottomNavigation(true)
+    }
+
     private fun render() {
 
         binding.editName.setText(namePlaylist)
         binding.editDescription.setText(descriptionPlaylist)
         binding.buttonCreate.text = "Сохранить"
         binding.arrowBackPlayer.setTitle("Редактировать")
+        //Так как плейлист не может существовать без названия
+        binding.buttonCreate.isEnabled = true
 
         Glide.with(requireContext())
             .load(coverImagePath)
@@ -100,7 +115,7 @@ class EditPlaylistFragment: Fragment() {
 
                 override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                     namePlaylist = p0.toString()
-                    switchActiveButtonCreate(namePlaylist)
+                    switchActiveButtonCreate(p0.toString())
                 }
 
                 override fun afterTextChanged(p0: Editable?) {
@@ -176,6 +191,19 @@ class EditPlaylistFragment: Fragment() {
                 findNavController().popBackStack()
             }
         })
+    }
+
+    private fun showBottomNavigation(flag: Boolean) {
+        val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        val divider = requireActivity().findViewById<View>(R.id.divider)
+
+        if (flag) {
+            bottomNavigationView.show()
+            divider.show()
+        } else {
+            bottomNavigationView.gone()
+            divider.gone()
+        }
     }
 
 

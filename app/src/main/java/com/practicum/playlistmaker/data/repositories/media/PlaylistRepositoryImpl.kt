@@ -52,6 +52,7 @@ class PlaylistRepositoryImpl(
             .map { playlistTracks ->
                 playlistTracks
                     .filter { track -> trackIds.contains(track.trackId) }
+                    .sortedByDescending { track -> trackIds.indexOf(track.trackId) }
                     .map { track -> converter.map(track) }
             }
     }
