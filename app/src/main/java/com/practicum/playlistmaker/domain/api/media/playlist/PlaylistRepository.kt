@@ -10,13 +10,27 @@ interface PlaylistRepository {
     //Добавление фотографии
     suspend fun saveImageToPrivateStorage(uri: Uri)
 
+    //Обновить плейлист
+    suspend fun update(playlist: Playlist)
+
     // Добавление существующего плейлиста
     suspend fun insert(playlist: Playlist)
 
     // Получение всех плейлистов
     fun getPlaylists(): Flow<List<Playlist>>
 
+    suspend fun getPlaylistById(playlistId: Long): Playlist
+
     // Добавление трека в плейлист
     suspend fun setTrack(playlist: Playlist,track: Track)
+
+    //Получение треков из плейлиста
+    fun getAllTracks(trackIdsJson: String): Flow<List<Track>>
+
+    //Удаление трека из плейлиста
+    suspend fun removeTrackFromPlaylist(playlist: Playlist, trackId: Int): Playlist
+
+    //Удаление плейлиста по id
+    suspend fun deletePlaylist(playlist: Playlist)
 
 }

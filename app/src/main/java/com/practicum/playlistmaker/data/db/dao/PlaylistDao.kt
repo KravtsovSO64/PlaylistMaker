@@ -36,4 +36,15 @@ interface PlaylistDao {
     @Query("SELECT trackCount FROM playlist_table WHERE id = :id")
     suspend fun getTrackCount(id: Long): Int
 
+    //Получение плейлиста по Id
+    @Query("SELECT * FROM playlist_table WHERE id = :id")
+    suspend fun getPlaylistById(id: Long): PlaylistEntity?
+
+    @Query("SELECT * FROM playlist_table")
+    suspend fun getAllPlaylistsSync(): List<PlaylistEntity>
+
+    //Удаление плейлиста по id
+    @Query("DELETE FROM playlist_table WHERE id = :playlistId")
+    suspend fun deletePlaylist(playlistId: Long)
+
 }

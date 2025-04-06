@@ -247,6 +247,7 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
                 is AddTrackStatus.Success -> {
                     Toast.makeText(requireContext(), " Добавлено в плейлист ${state.namePlaylist}", Toast.LENGTH_SHORT)
                         .show()
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 }
                 is AddTrackStatus.AlreadyExists -> {
                     Toast.makeText(requireContext(), "Трек уже добавлен в плейлист ${state.namePlaylist}", Toast.LENGTH_SHORT)

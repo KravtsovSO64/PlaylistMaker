@@ -22,4 +22,5 @@
     <color name="colorInactiveBottomNavigation">#1A1B22</color>
     <color name="colorActiveBottomNavigation">#3772E7</color>
     <color name="button_create">#AEAFB4</color>
+    <color name="backgroundPlaylist">#E6E8EB</color>
 </resources>

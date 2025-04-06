@@ -15,6 +15,7 @@ import com.practicum.playlistmaker.domain.model.Playlist
 import com.practicum.playlistmaker.domain.model.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -30,9 +31,68 @@ class PlaylistRepositoryImpl(
         appDatabase.playlistDao().insert(converter.map(playlist))
     }
 
+    override suspend fun update(playlist: Playlist) {
+        appDatabase.playlistDao().update(converter.map(playlist))
+    }
+
     override fun getPlaylists(): Flow<List<Playlist>> {
       val playlist = appDatabase.playlistDao().getPlaylists()
         return convertFromPlaylistEntity(playlist)
+    }
+
+    override suspend fun getPlaylistById(playlistId: Long): Playlist {
+      val playlist = appDatabase.playlistDao().getPlaylistById(playlistId)
+        return converter.map(playlist!!)
+    }
+
+    override fun getAllTracks(trackIdsJson: String): Flow<List<Track>> {
+        val trackIds  = convertJsonToList(trackIdsJson)
+
+        return appDatabase.tracksFromPlaylist().getAllTracks()
+            .map { playlistTracks ->
+                playlistTracks
+                    .filter { track -> trackIds.contains(track.trackId) }
+                    .sortedByDescending { track -> trackIds.indexOf(track.trackId) }
+                    .map { track -> converter.map(track) }
+            }
+    }
+
+    override suspend fun removeTrackFromPlaylist(playlist: Playlist, trackId: Int): Playlist {
+        val currentTrackIds = convertJsonToList(playlist.trackIdsJson).toMutableList()
+
+        currentTrackIds.remove(trackId)
+
+        appDatabase.playlistDao().removeTrackFromPlaylist(
+            playlistId = playlist.id,
+            newTrackIdsJson = convertListToJson(currentTrackIds),
+            newCount = playlist.trackCount - 1)
+
+        // Проверяем и удаляем трек, если он больше не используется
+        checkAndRemoveUnusedTrack(trackId)
+
+        return getPlaylistById(playlist.id)
+    }
+
+    override suspend fun deletePlaylist(playlist: Playlist) {
+        val trackIds = convertJsonToList(playlist.trackIdsJson)
+
+        appDatabase.playlistDao().deletePlaylist(playlist.id)
+
+        // Получаем все треки из всех плейлистов (асинхронно)
+        val allTrackIdsInPlaylists = withContext(Dispatchers.IO) {
+            getPlaylists()
+                .first() // Получаем первый эмиттированный список плейлистов
+                .flatMap { convertJsonToList(it.trackIdsJson) }
+                .toSet()
+        }
+
+        // Находим треки, которые больше не используются
+        val tracksToDelete = trackIds.filterNot { allTrackIdsInPlaylists.contains(it) }
+
+        // Удаляем неиспользуемые треки
+        tracksToDelete.forEach { trackId ->
+            appDatabase.tracksFromPlaylist().removeTrack(trackId)
+        }
     }
 
     override suspend fun setTrack(playlist: Playlist,track: Track) {
@@ -65,7 +125,6 @@ class PlaylistRepositoryImpl(
             .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
     }
 
-
     private fun convertFromPlaylistEntity(playlistEntity: Flow<List<PlaylistEntity>>): Flow<List<Playlist>> {
         return playlistEntity.map { list ->
             list.map { playlist ->
@@ -95,5 +154,17 @@ class PlaylistRepositoryImpl(
         return Gson().toJson(list)
     }
 
+    private suspend fun checkAndRemoveUnusedTrack(trackId: Int) {
+        val playlists = appDatabase.playlistDao().getAllPlaylistsSync()
+
+        val isTrackUsed = playlists.any { playlist ->
+            val trackIds = convertJsonToList(playlist.trackIdsJson)
+            trackIds.contains(trackId)
+        }
+
+        if (!isTrackUsed) {
+            appDatabase.tracksFromPlaylist().removeTrack(trackId)
+        }
+    }
 
 }
