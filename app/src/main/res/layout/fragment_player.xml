@@ -100,15 +100,19 @@
       app:layout_constraintStart_toStartOf="@id/leftBorder"
       app:layout_constraintTop_toBottomOf="@+id/artistNamePlayer"/>
 
-    <ImageView
+
+    <com.practicum.playlistmaker.utils.PlaybackButtonView
         android:id="@+id/button_play_stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        tools:background="@drawable/ic_button_play"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="24dp"
+        app:imagePadding="8dp"
+        app:imageSrcPlay="@drawable/ic_button_play"
+        app:imageSrcPause="@drawable/ic_button_pause"
         app:layout_constraintStart_toStartOf="@id/leftBorder"
         app:layout_constraintEnd_toEndOf="@+id/rightBorder"
-        app:layout_constraintTop_toBottomOf="@+id/artistNamePlayer"/>
+        app:layout_constraintTop_toBottomOf="@+id/artistNamePlayer"
+        />
 
     <ImageView
         android:id="@+id/buttonIsFavoritePlayer"
@@ -274,6 +278,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:visibility="gone"
         app:behavior_hideable="true"
         app:behavior_peekHeight="505dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">

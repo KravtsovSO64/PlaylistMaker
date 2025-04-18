@@ -74,7 +74,6 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
         clickHandler()
         setupEdgeToEdge()
         setupUI()
-        showBottomNavigation(false)
         bottomSheetManagement()
 
         viewModel.setData(track)
@@ -90,6 +89,7 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     override fun onPause() {
         super.onPause()
         showBottomNavigation(true)
+        binding.buttonPlayStop.isPlaying(switcher = false)
         if (viewModel.playerState.value?.isPlaying == true) {
             viewModel.togglePlayback()
         }
@@ -97,14 +97,19 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
         viewModel.stop()
+        _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        showBottomNavigation(false)
     }
 
     private fun clickHandler() {
         binding.apply {
 
-            buttonPlayStop.setOnClickListener {
+            buttonPlayStop.onClickPlayBack = {
                 viewModel.togglePlayback()
             }
 
@@ -133,10 +138,8 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     }
 
     private fun updateUI(state: PlayerState) {
-        binding.buttonPlayStop.setImageResource(
-            if (state.isPlaying) R.drawable.ic_button_pause else R.drawable.ic_button_play
-        )
         updateCurrentPosition(state.currentPosition)
+        binding.buttonPlayStop.isPlaying(state.isPlaying)
         binding.buttonIsFavoritePlayer.setImageResource(
             if (state.isFavourite) R.drawable.ic_button_is_favourite_track else R.drawable.ic_button_is_not_favourite_track
         )
@@ -155,7 +158,6 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
             buttonIsFavoritePlayer.setImageResource(
                 if (track.isFavorite) R.drawable.ic_button_is_favourite_track else R.drawable.ic_button_is_not_favourite_track
             )
-            buttonPlayStop.setImageResource(R.drawable.ic_button_play)
         }
 
         Glide.with(this)
