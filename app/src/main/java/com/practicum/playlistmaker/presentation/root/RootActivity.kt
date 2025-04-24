@@ -35,6 +35,7 @@ class RootActivity : AppCompatActivity() {
 
 
     private fun edgeToEdge() {
+        enableEdgeToEdge()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
             ViewCompat.setOnApplyWindowInsetsListener(

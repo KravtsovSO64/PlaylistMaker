@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="PlaybackButtonView">
+
+        <attr name="imagePadding"
+            format="dimension"/>
+
+        <attr name="imageSrcPlay"
+            format="reference"/>
+
+        <attr name="imageSrcPause"
+            format="reference"/>
+
+    </declare-styleable>
+
+</resources>
