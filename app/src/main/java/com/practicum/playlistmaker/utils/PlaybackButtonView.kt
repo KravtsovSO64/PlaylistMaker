@@ -26,6 +26,7 @@ class PlaybackButtonView @JvmOverloads constructor(
     private var imageRect = RectF(0f, 0f, 0f, 0f)
     private var imagePadding: Float = 0f
     private var isPlaying: Boolean = false
+    private var imageToDraw: Bitmap? = null
     var onClickPlayBack: (() -> Unit)? = null
 
     init {
@@ -55,7 +56,7 @@ class PlaybackButtonView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        val imageToDraw = if (isPlaying) imagePause else imagePlay
+         imageToDraw = if (isPlaying) imagePause else imagePlay
         imageToDraw?.let { canvas.drawBitmap(it, null, imageRect, null) }
     }
 
@@ -81,7 +82,7 @@ class PlaybackButtonView @JvmOverloads constructor(
     private fun togglePlayState() {
         isPlaying = !isPlaying
         invalidate()
-        onClickPlayBack!!.invoke()
+        onClickPlayBack?.invoke()
     }
 
 }
