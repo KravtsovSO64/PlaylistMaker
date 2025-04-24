@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.presentation.search.ui
 
 import android.content.Context
+import android.content.IntentFilter
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -15,9 +17,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.domain.model.Track
+import com.practicum.playlistmaker.presentation.player.ui.PlayerFragment
 import com.practicum.playlistmaker.presentation.search.state.State
 import com.practicum.playlistmaker.presentation.search.viewmodel.TrackSearchViewModel
-import com.practicum.playlistmaker.presentation.player.ui.PlayerFragment
+import com.practicum.playlistmaker.utils.NetworkBroadcastReceiver
 import com.practicum.playlistmaker.utils.gone
 import com.practicum.playlistmaker.utils.show
 import kotlinx.coroutines.Job
@@ -26,7 +29,9 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment(), OnTrackClickListener {
+
     private val viewModel by viewModel<TrackSearchViewModel>()
+    private val networkBroadcastReceiver = NetworkBroadcastReceiver()
 
     private var searchRequest: String = ""
     private var latestSearchText: String = ""
@@ -117,6 +122,16 @@ class SearchFragment : Fragment(), OnTrackClickListener {
         super.onResume()
         isClickAllowed = true
         render(State.Default)
+        ContextCompat.registerReceiver(requireContext(),
+            networkBroadcastReceiver,
+            IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        requireContext().unregisterReceiver(networkBroadcastReceiver)
     }
 
     private fun render(state: State) {

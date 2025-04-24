@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.presentation.player.ui
 
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -27,6 +29,7 @@ import com.practicum.playlistmaker.presentation.media.state.AddTrackStatus
 import com.practicum.playlistmaker.presentation.media.state.PlaylistViewState
 import com.practicum.playlistmaker.presentation.player.state.PlayerState
 import com.practicum.playlistmaker.presentation.player.viewmodel.PlayerViewModel
+import com.practicum.playlistmaker.utils.NetworkBroadcastReceiver
 import com.practicum.playlistmaker.utils.gone
 import com.practicum.playlistmaker.utils.show
 import kotlinx.coroutines.delay
@@ -46,6 +49,7 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
 
     private val binding get() = _binding!!
     private val viewModel by viewModel<PlayerViewModel>()
+    private val networkBroadcastReceiver = NetworkBroadcastReceiver()
 
     private var isClickAllowed = true
     private var _binding: FragmentPlayerBinding? = null
@@ -89,6 +93,7 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     override fun onPause() {
         super.onPause()
         showBottomNavigation(true)
+        requireContext().unregisterReceiver(networkBroadcastReceiver)
         binding.buttonPlayStop.isPlaying(switcher = false)
         if (viewModel.playerState.value?.isPlaying == true) {
             viewModel.togglePlayback()
@@ -104,6 +109,7 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     override fun onResume() {
         super.onResume()
         showBottomNavigation(false)
+        ContextCompat.registerReceiver(requireContext(),networkBroadcastReceiver, IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"),  ContextCompat.RECEIVER_NOT_EXPORTED )
     }
 
     private fun clickHandler() {
@@ -299,4 +305,5 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
         }
         return currentState
     }
+
 }
