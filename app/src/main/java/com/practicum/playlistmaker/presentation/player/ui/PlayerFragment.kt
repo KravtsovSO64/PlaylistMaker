@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.presentation.player.ui
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -13,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
@@ -77,6 +79,16 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
 
     }
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            bindMusicService()
+        } else {
+            Toast.makeText(requireContext(), "Can't bind service!", Toast.LENGTH_LONG).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         track = arguments?.getSerializable(ARGS_TRACK) as? Track
@@ -95,15 +107,18 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        bindMusicService()
         startUI()
         clickHandler()
         setupEdgeToEdge()
         bottomSheetManagement()
 
-        viewModel.setTrack(track)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            bindMusicService()
+        }
 
-        //Подписались на изменения состояния
+        viewModel.setTrack(track)
         viewModel.playerState.observe(viewLifecycleOwner) { state ->
             updateUI(state)
         }
