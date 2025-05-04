@@ -1,7 +1,6 @@
 package com.practicum.playlistmaker.di
 
 import android.content.Context
-import android.media.MediaPlayer
 import androidx.room.Room
 import com.google.gson.Gson
 import com.practicum.playlistmaker.data.db.AppDatabase
@@ -33,8 +32,6 @@ val dataModule = module {
         .build()
         .create(MusicApiService::class.java)
     }
-
-    single { MediaPlayer() }
 
     single {
         androidContext()
