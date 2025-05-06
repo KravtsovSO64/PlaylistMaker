@@ -8,121 +8,115 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.practicum.playlistmaker.domain.api.media.favorite.FavouriteTrackIterator
 import com.practicum.playlistmaker.domain.api.media.playlist.PlaylistIterator
-import com.practicum.playlistmaker.domain.api.player.MediaPlayerIterator
-import com.practicum.playlistmaker.domain.api.player.PlayerStatusListener
 import com.practicum.playlistmaker.domain.model.Playlist
 import com.practicum.playlistmaker.domain.model.Track
 import com.practicum.playlistmaker.presentation.media.state.AddTrackStatus
 import com.practicum.playlistmaker.presentation.media.state.PlaylistViewState
+import com.practicum.playlistmaker.presentation.player.service.AudioPlayerControl
 import com.practicum.playlistmaker.presentation.player.state.PlayerState
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class PlayerViewModel(
-    private val iterator: MediaPlayerIterator,
     private val iteratorPlaylist: PlaylistIterator,
     private val iteratorFavouriteTrack: FavouriteTrackIterator
     ) : ViewModel() {
 
     private lateinit var track: Track
+
     private var currentPlaylists: List<Playlist> = emptyList()
 
-    private val _playerState = MutableLiveData<PlayerState>().apply { value = PlayerState() }
+    //Реализовывает связь с Service type is bound
+    private var audioPlayerControl: AudioPlayerControl? = null
+
+    //Состояние плеера
+    private val _playerState = MutableLiveData<PlayerState>(PlayerState.Default())
     val playerState: LiveData<PlayerState> get() = _playerState
 
+    //Состояние плейлиста
     private val _playlistsState = MutableLiveData<PlaylistViewState>()
     val playlistState: LiveData<PlaylistViewState> get() = _playlistsState
 
     private val _addTrackStatus = MutableLiveData<AddTrackStatus>()
     val addTrackStatus: LiveData<AddTrackStatus> get() = _addTrackStatus
 
-    private var timingJob: Job? = null
+    //Для хранения состояния находится трек в избранном или нет
+    private val _isFavoriteTrack = MutableLiveData<Boolean>()
+    val isFavoriteTrack: LiveData<Boolean> get() = _isFavoriteTrack
 
-    fun setAudioUrl(url: String) {
-        val currentState = _playerState.value ?: PlayerState()
-        _playerState.value = currentState.copy(audioUrl = url)
-    }
-
-    private fun play() {
-        _playerState.value?.audioUrl?.let {
-            iterator.play(it)
-            val currentState = _playerState.value ?: PlayerState()
-            _playerState.value = currentState.copy(isPlaying = true)
-            startUpdatingCurrentPosition()
-        }
-    }
-
-    private fun pause() {
-        iterator.pause()
-        val currentState = _playerState.value ?: PlayerState()
-        _playerState.value = currentState.copy(isPlaying = false)
-    }
-
-    fun stop() {
-        iterator.stop()
-        _playerState.value = PlayerState()
-    }
-
-    fun togglePlayback() {
-        if (_playerState.value?.isPlaying == true) {
-            pause()
-        } else {
-            play()
-        }
-    }
-
-    private fun startUpdatingCurrentPosition() {
-        timingJob = viewModelScope.launch {
-            while (iterator.isPlaying()){
-                delay(300L)
-                if (iterator.isPlaying()) {
-                    val currentTime = SimpleDateFormat("mm:ss", Locale.getDefault()).format(iterator.currentPosition())
-                    val currentState = _playerState.value ?: PlayerState()
-                    _playerState.value = currentState.copy(currentPosition = currentTime)
-                }
-            }
-            timingJob?.cancel()
-        }
-    }
-
-    fun setupListeners() {
-        iterator.setupPlayerStatusListener(object : PlayerStatusListener {
-            override fun onPlaybackCompleted() {
-                val currentState = _playerState.value ?: PlayerState()
-                _playerState.value = currentState.copy(isPlaying = false, currentPosition = "00:00")
-            }
-        })
-    }
-
-    fun setData(track: Track) {
+    fun setTrack(track: Track) {
         this.track = track
-        val currentState = _playerState.value ?: PlayerState()
-        _playerState.value = currentState.copy(isFavourite = track.isFavorite)
+
+        viewModelScope.launch {
+            val favoriteListId = iteratorFavouriteTrack.getIndicatorsFavouriteTracks()
+            if (favoriteListId.contains(track.trackId)) {
+                this@PlayerViewModel.track.isFavorite = true
+                _isFavoriteTrack.postValue(track.isFavorite)
+            }
+        }
     }
 
-    fun getFavouriteTrack(track: Track) {
+    fun setAudioPlayerControl(controller: AudioPlayerControl) {
+        audioPlayerControl = controller
+
+        //Подписываемся на поток состояния Service в процессе модифицируем поток
+        viewModelScope.launch {
+            audioPlayerControl?.getPlayerState()
+                ?.map { currentState ->
+                    when (currentState) {
+                        is PlayerState.Default -> currentState.copy(isFavourite = track.isFavorite)
+                        is PlayerState.Prepared -> currentState.copy(isFavourite = track.isFavorite)
+                        is PlayerState.Playing -> currentState.copy(isFavourite = track.isFavorite)
+                        is PlayerState.Paused -> currentState.copy(isFavourite = track.isFavorite)
+                    }
+                }
+                ?.collect { state ->
+                    _playerState.postValue(state)
+                }
+        }
+    }
+
+    fun onPlayerButtonClicked() {
+        if (playerState.value is PlayerState.Playing) {
+            audioPlayerControl?.pausePlayer()
+        } else {
+            audioPlayerControl?.startPlayer()
+        }
+    }
+
+    fun showNotification() {
+      audioPlayerControl?.showNotification()
+    }
+
+    fun hideNotification() {
+        audioPlayerControl?.hideNotification()
+    }
+
+    //Метод для добавления трека в избранное
+    fun addTrackToFavorite(track: Track) {
+
+        this@PlayerViewModel.track.isFavorite = true
+
         viewModelScope.launch {
             iteratorFavouriteTrack.insertFavouriteTrack(track)
-
-            val currentState = _playerState.value ?: PlayerState()
             track.isFavorite = true
-            _playerState.value = currentState.copy(isFavourite = true)
+            _isFavoriteTrack.postValue(this@PlayerViewModel.track.isFavorite)
         }
     }
 
+    //Удаление трека из избранного
     fun deleteTrackFromFavourite(track: Track) {
+
+        this@PlayerViewModel.track.isFavorite = false
+
         viewModelScope.launch {
             iteratorFavouriteTrack.deleteFavouriteTrack(track)
-
-            val currentState = _playerState.value ?: PlayerState()
             track.isFavorite = false
-            _playerState.value = currentState.copy(isFavourite = false)
+            _isFavoriteTrack.postValue(this@PlayerViewModel.track.isFavorite)
         }
     }
 
+    //Получение всех плейлистов
     fun getPlaylists() {
         viewModelScope.launch {
             iteratorPlaylist
@@ -134,10 +128,14 @@ class PlayerViewModel(
         }
     }
 
+    fun removeAudioPlayerControl() {
+        audioPlayerControl = null
+    }
+
     private fun processResult(playlist: List<Playlist>) {
         if (playlist.isEmpty()) {
             _playlistsState.postValue(PlaylistViewState.Empty(true))
-        } else{
+        } else {
             _playlistsState.postValue(PlaylistViewState.Content(playlist, false))
         }
     }
@@ -155,9 +153,9 @@ class PlayerViewModel(
                 _addTrackStatus.postValue(AddTrackStatus.AlreadyExists(playlist.name))
             } else {
                 _addTrackStatus.postValue(AddTrackStatus.Success(playlist.name))
-               viewModelScope.launch {
-                   iteratorPlaylist.setTrack(playlist, track)
-               }
+                viewModelScope.launch {
+                    iteratorPlaylist.setTrack(playlist, track)
+                }
             }
         }
     }
@@ -166,4 +164,5 @@ class PlayerViewModel(
         val type = object : TypeToken<List<Int>>() {}.type
         return Gson().fromJson(trackIdsJson, type) ?: emptyList()
     }
+
 }

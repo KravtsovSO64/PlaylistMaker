@@ -1,13 +1,20 @@
 package com.practicum.playlistmaker.presentation.player.ui
 
+import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
+import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
@@ -27,6 +34,7 @@ import com.practicum.playlistmaker.domain.model.Playlist
 import com.practicum.playlistmaker.domain.model.Track
 import com.practicum.playlistmaker.presentation.media.state.AddTrackStatus
 import com.practicum.playlistmaker.presentation.media.state.PlaylistViewState
+import com.practicum.playlistmaker.presentation.player.service.PlayerService
 import com.practicum.playlistmaker.presentation.player.state.PlayerState
 import com.practicum.playlistmaker.presentation.player.viewmodel.PlayerViewModel
 import com.practicum.playlistmaker.utils.NetworkBroadcastReceiver
@@ -56,6 +64,30 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     private lateinit var track: Track
     private lateinit var timer: TextView
     private lateinit var recyclerView: RecyclerView
+    private var isServiceBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(p0: ComponentName?, service: IBinder?) {
+           val binder = service as PlayerService.PlayerServiceBinder
+            viewModel.setAudioPlayerControl(binder.getPlayerService())
+        }
+
+        override fun onServiceDisconnected(p0: ComponentName?) {
+           viewModel.removeAudioPlayerControl()
+            isServiceBound = false
+        }
+
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            bindMusicService()
+        } else {
+            Toast.makeText(requireContext(), "Can't bind service!", Toast.LENGTH_LONG).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,51 +107,94 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        startUI()
         clickHandler()
         setupEdgeToEdge()
-        setupUI()
         bottomSheetManagement()
 
-        viewModel.setData(track)
-        viewModel.setAudioUrl(track.previewUrl.toString())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            bindMusicService()
+        }
 
+        viewModel.setTrack(track)
         viewModel.playerState.observe(viewLifecycleOwner) { state ->
             updateUI(state)
         }
 
-        viewModel.setupListeners()
     }
 
-    override fun onPause() {
-        super.onPause()
-        showBottomNavigation(true)
-        requireContext().unregisterReceiver(networkBroadcastReceiver)
-        binding.buttonPlayStop.isPlaying(switcher = false)
-        if (viewModel.playerState.value?.isPlaying == true) {
-            viewModel.togglePlayback()
+    override fun onStart() {
+        viewModel.hideNotification()
+        super.onStart()
+    }
+
+    override fun onStop() {
+        viewModel.showNotification()
+        super.onStop()
+    }
+
+    private fun bindMusicService() {
+        if (!isServiceBound) {
+
+            val intent = Intent(requireContext(), PlayerService::class.java).apply {
+                putExtra("TRACK_URL", track.previewUrl)
+                putExtra("TRACK_NAME", track.trackName)
+                putExtra("ARTIST_NAME", track.artistName)
+            }
+
+            requireContext().bindService(
+                intent,
+                serviceConnection,
+                Context.BIND_AUTO_CREATE
+            )
+            isServiceBound = true
         }
     }
 
+    private fun unbindMusicService() {
+        if (isServiceBound) {
+            requireContext().unbindService(serviceConnection)
+            isServiceBound = false
+        }
+    }
+
+    override fun onPause() {
+        showBottomNavigation(true)
+        requireContext().unregisterReceiver(networkBroadcastReceiver)
+        super.onPause()
+    }
+
     override fun onDestroyView() {
-        super.onDestroyView()
-        viewModel.stop()
         _binding = null
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        unbindMusicService()
+        super.onDestroy()
     }
 
     override fun onResume() {
-        super.onResume()
         showBottomNavigation(false)
-        ContextCompat.registerReceiver(requireContext(),networkBroadcastReceiver, IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"),  ContextCompat.RECEIVER_NOT_EXPORTED )
+        ContextCompat.registerReceiver(
+            requireContext(),
+            networkBroadcastReceiver,
+            IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"),
+            ContextCompat.RECEIVER_NOT_EXPORTED)
+        super.onResume()
     }
 
     private fun clickHandler() {
         binding.apply {
 
             buttonPlayStop.onClickPlayBack = {
-                viewModel.togglePlayback()
+               viewModel.onPlayerButtonClicked()
             }
 
             arrowBackPlayer.setNavigationOnClickListener {
+                unbindMusicService()
                 findNavController().popBackStack()
             }
 
@@ -144,14 +219,41 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
     }
 
     private fun updateUI(state: PlayerState) {
-        updateCurrentPosition(state.currentPosition)
-        binding.buttonPlayStop.isPlaying(state.isPlaying)
-        binding.buttonIsFavoritePlayer.setImageResource(
-            if (state.isFavourite) R.drawable.ic_button_is_favourite_track else R.drawable.ic_button_is_not_favourite_track
-        )
+
+        val buttonPlayStop = binding.buttonPlayStop
+
+        when (state) {
+            is PlayerState.Default -> {
+                viewModel.hideNotification()
+                updateCurrentPosition(state.progress)
+                buttonPlayStop.isPlaying(state.buttonState)
+            }
+            is PlayerState.Prepared -> {
+                viewModel.hideNotification()
+                updateCurrentPosition(state.progress)
+                buttonPlayStop.isPlaying(state.buttonState)
+            }
+            is PlayerState.Playing -> {
+                updateCurrentPosition(state.progress)
+                buttonPlayStop.isPlaying(state.buttonState)
+            }
+            is PlayerState.Paused -> {
+                viewModel.hideNotification()
+                updateCurrentPosition(state.progress)
+                buttonPlayStop.isPlaying(state.buttonState)
+
+            }
+        }
+
     }
 
-    private fun setupUI() {
+    private fun startUI() {
+
+        viewModel.isFavoriteTrack.observe(viewLifecycleOwner) { isFavorite ->
+            binding.buttonIsFavoritePlayer.setImageResource(
+                if (isFavorite) R.drawable.ic_button_is_favourite_track else R.drawable.ic_button_is_not_favourite_track
+            )
+        }
 
         binding.apply {
             trackNamePlayer.text = track.trackName
@@ -161,9 +263,6 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
             releaseYearTrackPlayer.text = track.releaseDate?.let { getYearFromDate(it).toString() }
             styleTrackPlayer.text = track.primaryGenreName
             countryTrackPlayer.text = track.country
-            buttonIsFavoritePlayer.setImageResource(
-                if (track.isFavorite) R.drawable.ic_button_is_favourite_track else R.drawable.ic_button_is_not_favourite_track
-            )
         }
 
         Glide.with(this)
@@ -179,10 +278,11 @@ class PlayerFragment : Fragment(), PlaylistAdapter.OnPlaylistClickListener {
 
     private fun onFavoriteClicked() {
         if (!track.isFavorite) {
-            viewModel.getFavouriteTrack(track)
+            viewModel.addTrackToFavorite(track)
         } else {
             viewModel.deleteTrackFromFavourite(track)
         }
+
     }
 
     private fun updateCurrentPosition(elapsedTime: String) {
