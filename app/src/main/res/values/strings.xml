@@ -1,12 +1,13 @@
 <resources>
-    <string name="app_name">Playlist maket</string>
-    <string name="main_search">Поиск</string>
+    <string name="app_name">Playlist maker</string>
+    <string name="default_timer">00:00</string>
+    <string name="search">Поиск</string>
     <string name="main_media">Медиатека</string>
-    <string name="main_setting">Настройки</string>
+    <string name="settings">Настройки</string>
     <string name="user_agreement">Пользовательское соглашение</string>
     <string name="share_app">Поделиться приложением</string>
     <string name="write_support">Написать в поддержку</string>
-    <string name="dark_view">Темная тема</string>
+    <string name="dark_theme">Темная тема</string>
     <string name="shareApp">https://practicum.yandex.ru/</string>
     <string name="supportMail">kraffc@yandex.ru</string>
     <string name="supportTitleMessage">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>

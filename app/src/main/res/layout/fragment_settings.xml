@@ -22,7 +22,6 @@
            android:gravity="start"
            android:layout_marginLeft="18dp"
            android:paddingTop="@dimen/settingBar_marginTop"
-           android:text="@string/main_setting"
            android:textColor="@color/setting_header_text"
            android:textSize="@dimen/mainText_size" />
    </LinearLayout>
@@ -42,8 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:padding="@dimen/main_padding"
-                android:text="@string/dark_view"/>
+                android:padding="@dimen/main_padding" />
 
             <Switch
                 android:id="@+id/themeSwitcher"
