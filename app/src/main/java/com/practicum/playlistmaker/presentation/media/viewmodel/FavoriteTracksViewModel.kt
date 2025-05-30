@@ -13,7 +13,7 @@ class FavoriteTracksViewModel(
     private val iterator: FavouriteTrackIterator
 ) : ViewModel() {
 
-   fun getListFavourite() {
+    fun getListFavourite() {
         viewModelScope.launch {
             iterator
                 .getListFavouriteTracks()
@@ -23,15 +23,14 @@ class FavoriteTracksViewModel(
         }
     }
 
-    //LiveData
-    private val _stateView = MutableLiveData<FavouriteTrackViewState>()
-    fun observeState(): LiveData<FavouriteTrackViewState> = _stateView
+    private val _stateFavourite = MutableLiveData<FavouriteTrackViewState>()
+    val stateFavourite: LiveData<FavouriteTrackViewState> get() = _stateFavourite
 
     private fun processResult(tracks: List<Track>) {
         if (tracks.isEmpty()) {
-            _stateView.postValue(FavouriteTrackViewState.Empty)
+            _stateFavourite.postValue(FavouriteTrackViewState.Empty)
         } else{
-            _stateView.postValue(FavouriteTrackViewState.Content(tracks))
+            _stateFavourite.postValue(FavouriteTrackViewState.Content(tracks))
         }
     }
 }

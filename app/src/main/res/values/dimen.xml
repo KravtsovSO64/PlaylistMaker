@@ -16,4 +16,16 @@
     <dimen name="searchText_size">12sp</dimen>
     <dimen name="tabSizeText">14sp</dimen>
 
+
+
+    <dimen name="pad_4dp">4dp</dimen>
+    <dimen name="pad_8dp">8dp</dimen>
+    <dimen name="pad_12dp">12dp</dimen>
+    <dimen name="pad_16dp">16dp</dimen>
+    <dimen name="pad_24dp">24dp</dimen>
+    <dimen name="pad_32dp">32dp</dimen>
+    <dimen name="pad_64dp">64dp</dimen>
+    <dimen name="pad_128dp">128dp</dimen>
+
+
 </resources>

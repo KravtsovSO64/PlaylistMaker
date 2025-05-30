@@ -3,8 +3,10 @@ package com.practicum.playlistmaker.presentation.media.ui.playlist
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.domain.model.Track
-import com.practicum.playlistmaker.presentation.search.ui.OnTrackClickListener
+import com.practicum.playlistmaker.presentation.OnTrackClickListener
+import com.practicum.playlistmaker.presentation.OnTrackLongClickListener
 import com.practicum.playlistmaker.presentation.search.ui.TrackViewHolder
+
 
 class TrackPLAdapter(
     private val list: List<Track>,
@@ -26,9 +28,4 @@ class TrackPLAdapter(
     }
 
     override fun getItemCount(): Int = list.size
-
-    interface OnTrackLongClickListener {
-        fun onItemLongClick(track: Track): Boolean
-    }
 }
-

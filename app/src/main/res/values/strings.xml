@@ -22,7 +22,7 @@
     <string name="mediaFavoriteHolder">Ваша медиатека пуста</string>
     <string name="mediaPlaylistHolder">Вы не создали\nни одного плейлиста </string>
     <string name="favoriteTrackTab">Избранные треки</string>
-    <string name="PlaylistTab">Плейлисты</string>
+    <string name="playlistTab">Плейлисты</string>
     <string name="checkInternetConnection">Проверьте подключение к интернету</string>
     <string name="errorServer">Ошибка сервера</string>
     <string name="addToPlaylist" translatable="false">Добавить в плейлист</string>

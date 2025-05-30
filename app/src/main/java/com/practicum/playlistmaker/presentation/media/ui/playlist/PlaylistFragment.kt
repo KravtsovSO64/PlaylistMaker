@@ -23,16 +23,19 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
 import com.practicum.playlistmaker.domain.model.Playlist
 import com.practicum.playlistmaker.domain.model.Track
+import com.practicum.playlistmaker.presentation.OnTrackClickListener
+import com.practicum.playlistmaker.presentation.OnTrackLongClickListener
 import com.practicum.playlistmaker.presentation.media.viewmodel.PlaylistViewModel
 import com.practicum.playlistmaker.presentation.player.ui.PlayerFragment
-import com.practicum.playlistmaker.presentation.search.ui.OnTrackClickListener
 import com.practicum.playlistmaker.utils.gone
 import com.practicum.playlistmaker.utils.show
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
-class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrackLongClickListener {
+
+class PlaylistFragment: Fragment(), OnTrackClickListener, OnTrackLongClickListener {
 
     companion object {
         const val ARGS_PLAYLIST = "playlist"
@@ -52,7 +55,7 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
     private var removePlaylistDialog: MaterialAlertDialogBuilder? = null
 
     private val binding: FragmentPlaylistBinding get() = _binding!!
-    private val viewModel: PlaylistViewModel by viewModel()
+    private val viewModel: PlaylistViewModel by viewModel { parametersOf(playlist) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,7 +114,7 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
         viewModel.track.observe(viewLifecycleOwner) { tracks ->
            val durationSum = tracks.sumOf { it.trackTimeMillis }
             binding.time.text = getMinutesString(durationSum)
-            adapter = TrackPLAdapter(tracks, this, this)
+            adapter = TrackPLAdapter(tracks,this, this)
             adapter?.notifyDataSetChanged()
             recyclerView?.adapter = adapter
         }
@@ -139,15 +142,10 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
                 sharePlaylist()
             }
 
-            buttonMore.setOnClickListener {
-
-            }
-
             arrowBackPlayer.setOnClickListener {
                 findNavController().popBackStack()
             }
         }
-
     }
 
     private fun createRecyclerView() {
@@ -190,6 +188,7 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
             divider.gone()
         }
     }
+
 
     override fun onItemClick(track: Track) {
         if (clickDebounce()) openPlayer(track)
@@ -300,6 +299,8 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
             findNavController().navigate(R.id.action_playlistFragment_to_editPlaylistFragment, EditPlaylistFragment.createArgs(playlist))
         }
 
+
+
         includeMenu.removePlaylist.setOnClickListener {
             removePlaylistDialog?.show()
         }
@@ -339,3 +340,5 @@ class PlaylistFragment: Fragment(), OnTrackClickListener, TrackPLAdapter.OnTrack
         return true
     }
 }
+
+

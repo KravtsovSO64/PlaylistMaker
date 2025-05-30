@@ -39,8 +39,8 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true  //подключили View Binding
-        compose = true //подключили Compose
+        viewBinding = true
+        compose = true
     }
 
     composeOptions {
@@ -69,6 +69,8 @@ dependencies {
     implementation(libs.androidx.runtime.android)
     implementation(libs.androidx.tiles.tooling.preview)
     implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.navigation.compose.jvmstubs)
     kapt(libs.androidx.room.compiler)
 
     // Coroutines
@@ -82,6 +84,7 @@ dependencies {
 
     // Image Loading
     implementation(libs.bumptech.glide)
+    implementation(libs.coil.compose)
 
     // UI
     implementation(libs.facebook.shimmer)
@@ -95,6 +98,7 @@ dependencies {
     implementation (libs.material)
     implementation (libs.androidx.activity.compose.v182)
     debugImplementation(libs.androidx.ui.tooling)
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
 
     testImplementation(libs.junit)
     annotationProcessor (libs.compiler)
