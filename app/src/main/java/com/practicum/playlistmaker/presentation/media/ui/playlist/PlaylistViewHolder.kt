@@ -21,8 +21,8 @@ class PlaylistViewHolder(view: View): RecyclerView.ViewHolder(view) {
             .load(playlist.coverImagePath)
             .apply(
                 RequestOptions()
-                    .placeholder(R.drawable.ic_place_holder) // Заглушка при загрузке
-                    .transform(RoundedCorners(8)) // Закругление углов (8dp)
+                    .placeholder(R.drawable.ic_place_holder)
+                    .transform(RoundedCorners(8))
             )
             .into(coverImage)
         name.text = playlist.name

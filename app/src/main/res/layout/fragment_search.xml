@@ -19,7 +19,7 @@
             android:fontFamily="@font/ys_display_medium"
             android:gravity="start"
             android:paddingTop="@dimen/settingBar_marginTop"
-            android:text="@string/main_search"
+            android:text="@string/search"
             android:textColor="@color/setting_header_text"
             android:textFontWeight="500"
             android:textSize="@dimen/mainText_size" />
@@ -44,7 +44,7 @@
             android:layout_weight="1"
             android:drawableStart="@drawable/ic_search"
             android:drawablePadding="8dp"
-            android:hint="@string/main_search"
+            android:hint="@string/search"
             android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLines="1"

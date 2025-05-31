@@ -8,5 +8,4 @@ sealed class State {
     data class Content(val tracks: List<Track>): State()
     data class History(val tracks: List<Track>): State()
     data object Empty: State()
-    data object Default: State()
 }

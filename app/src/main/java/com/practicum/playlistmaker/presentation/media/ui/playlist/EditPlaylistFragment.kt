@@ -205,6 +205,5 @@ class EditPlaylistFragment: Fragment() {
             divider.gone()
         }
     }
-
-
 }
+

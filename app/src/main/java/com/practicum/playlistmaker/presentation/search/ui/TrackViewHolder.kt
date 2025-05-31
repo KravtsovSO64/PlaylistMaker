@@ -38,6 +38,3 @@ class TrackViewHolder(parentView : ViewGroup) :
         return formatTime.format(trackTimeMillis).toString()
     }
 }
-
-
-
